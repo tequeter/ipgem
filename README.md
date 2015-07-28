@@ -214,7 +214,7 @@ You can customize this heavily to fit your needs:
 
 ## Author, Credits, and Licence
 
-Idea and implementation: Thomas Equeter <thomas@equeter.com>
+Idea and implementation: Thomas Equeter
 
 Sponsors: Idgroup paid me to write IPGEM and we agreed to contribute it back to
 the Free Software community. I did further improvements for Saint Maclou,
