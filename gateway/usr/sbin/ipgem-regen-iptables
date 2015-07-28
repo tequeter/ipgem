@@ -1,8 +1,8 @@
 #!/bin/bash
 
-prefix=/etc/ipgroup/iptables.prefix
-suffix=/etc/ipgroup/iptables.suffix
-hosts=/etc/ipgroup/hosts
+prefix=/etc/ipgem-gateway/iptables.prefix
+suffix=/etc/ipgem-gateway/iptables.suffix
+hosts=/etc/ipgem-gateway/hosts
 
 echo "# BEGIN $prefix"
 echo

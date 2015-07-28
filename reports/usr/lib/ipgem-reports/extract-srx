@@ -9,7 +9,7 @@ use DateTime::Duration;
 use DateTime::Format::ISO8601;
 use DBI;
 
-my $CONF = '/etc/ipgem-rp/extract.conf';
+my $CONF = '/etc/ipgem-reports/extract.conf';
 unless ( my $do_ret = do $CONF )
 {
    warn "couldn't parse $CONF: $@" if $@;

@@ -47,11 +47,11 @@ sub main
     $sth_ref->execute( $start, $end );
     my $connections = ($sth_ref->fetchrow_array())[0];
 
-    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-rp/weekly-stats-uconn.sql' ) );
+    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-reports/weekly-stats-uconn.sql' ) );
     $sth_ref->execute( $start, $end );
     my $uniques = ($sth_ref->fetchrow_array())[0];
 
-    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-rp/weekly-stats-todo.sql' ) );
+    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-reports/weekly-stats-todo.sql' ) );
     $sth_ref->execute( $start, $end, $start, $end );
     my $todo_ref = $sth_ref->fetchall_arrayref();
     my $total_todo = 0;

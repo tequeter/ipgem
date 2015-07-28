@@ -93,7 +93,7 @@ through the IPGEM gateway.
 
 ### Migrate
 
-1. Update `/etc/ipgem-gw/hosts` with the servers you're migrating (but don't
+1. Update `/etc/ipgem-gateway/hosts` with the servers you're migrating (but don't
    apply the configuration yet).
 2. Reduce the TTL of the involved DNS records to 60 or 300 seconds (you need
    to do this at least _current TTL_ before the migration!).
@@ -134,16 +134,16 @@ don't need to be on the same host.
 
 ### Initial Configuration
 
-Go through `/etc/ipgem-gw/networking` and follow the instructions in the comments.
+Go through `/etc/ipgem-gateway/networking` and follow the instructions in the comments.
 
 There is a resolver that performs periodic name resolution for the client IPs
 that go through the IPGEM (this is useful for dynamic IPs, ie. PCs on DHCP). If
 you need to bypass the DNS for some IPs (such as a large network of shops not
-integrated in the DNS), edit the Perl code in `/etc/ipgem-gw/resolver`.
+integrated in the DNS), edit the Perl code in `/etc/ipgem-gateway/resolver`.
 
 ### Configuration During the Migration
 
-Edit `/etc/ipgem-gw/hosts` to match which IPs the gateway will impersonate. Then,
+Edit `/etc/ipgem-gateway/hosts` to match which IPs the gateway will impersonate. Then,
 run this to apply the configuration:
 
     ipgem-regen-ifcfg
@@ -158,7 +158,7 @@ instance, on Cisco it's `clear ip arp X.X.X.X`. It would also be possible to
 send some gratuitous ARPs instead, but I did not test it.
 
 You may want to stop relaying hosts or specific services at some point. Edit
-`/etc/ipgem-gw/iptables.prefix` accordingly, check the results with
+`/etc/ipgem-gateway/iptables.prefix` accordingly, check the results with
 `ipgem-regen-iptables`, then apply them with:
 
     ipgem-regen-iptables |tee /etc/sysconfig/iptables |iptables-restore
@@ -171,17 +171,17 @@ on what to fix.
 
 ### File System Layout
 
-    /etc/ipgem-rp             -- All tunables should be here
-    /etc/ipgem-rp/steps       -- Called in order by ipgem-report (E, T, L)
-    /etc/ipgem-rp/reports     -- SQL for each report
-    /usr/lib/ipgem-rp         -- Internals
+    /etc/ipgem-reports             -- All tunables should be here
+    /etc/ipgem-reports/steps       -- Called in order by ipgem-report (E, T, L)
+    /etc/ipgem-reports/reports     -- SQL for each report
+    /usr/lib/ipgem-reports         -- Internals
     /usr/bin                  -- User-facing scripts
     /var/lib/ipgem/reports    -- Result files (CSV)
     /var/cache/ipgem/logs/TYPE/HOST/ -- Local copy of the gateway logs
 
 ### Getting Logs to the Report Host
 
-`/etc/ipgem-gw/get-logs` is a sample script that gathers logs from the
+`/etc/ipgem-gateway/get-logs` is a sample script that gathers logs from the
 gateway(s) into `/var/cache/ipgem/logs/TYPE/HOST/`, which TYPE one of:
 - linux (connections logged by the gateway),
 - resolver (semi-real-time IP-to-name resolutions performed by the gateway to
@@ -191,23 +191,23 @@ gateway(s) into `/var/cache/ipgem/logs/TYPE/HOST/`, which TYPE one of:
 
 ### Producing Reports
 
-`/usr/bin/ipgem-report` runs scripts in `/etc/ipgem-rp/steps`, extracting the
+`/usr/bin/ipgem-report` runs scripts in `/etc/ipgem-reports/steps`, extracting the
 raw logs into a temporary SQLite database, and (after some work) loading the
 end results into CSV files in `/var/lib/ipgem/reports` (reports that you can
 open in Excel).
 
 You can customize this heavily to fit your needs:
-- Edit log filters in `/etc/ipgem-rp/extract.conf`.
-- Classify connections by editing `/etc/ipgem-rp/classify.conf`
-- Add reports to run in `/etc/ipgem-rp/steps/80-load-reports` and/or tweak the
-  existing ones in `/etc/ipgem-rp/reports/` (the query is in the .sql, while
+- Edit log filters in `/etc/ipgem-reports/extract.conf`.
+- Classify connections by editing `/etc/ipgem-reports/classify.conf`
+- Add reports to run in `/etc/ipgem-reports/steps/80-load-reports` and/or tweak the
+  existing ones in `/etc/ipgem-reports/reports/` (the query is in the .sql, while
   .columns is just the first line to include in the resulting CSV).
-- Finally, add/edit links and/or files in `/etc/ipgem-rp/steps` (executable
+- Finally, add/edit links and/or files in `/etc/ipgem-reports/steps` (executable
   files are executed, .sql are interpreted with sqlite3 onto the DB).
 
 ### Further Reports to Run Manually
 
-- `/usr/bin/ipgem-rp-load-connection` produces a CSV for a given source and
+- `/usr/bin/ipgem-report-connection` produces a CSV for a given source and
   destination.
 - `/usr/bin/ipgem-weekly-stats` produces a high-level report for a given week
   (amount of connections etc).

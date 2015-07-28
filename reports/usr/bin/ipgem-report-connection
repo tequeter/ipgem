@@ -8,7 +8,7 @@ use DateTime::Format::Strptime;
 use Text::CSV;
 use DBI;
 
-my $CONF = '/etc/ipgem-rp/load.conf';
+my $CONF = '/etc/ipgem-reports/load.conf';
 unless ( my $do_ret = do $CONF )
 {
    warn "couldn't parse $CONF: $@" if $@;
@@ -33,7 +33,7 @@ sub main
 {
     if ( @ARGV != 2 )
     {
-        die "Syntax: ipgem-rp-load-connection source dest\n";
+        die "Syntax: ipgem-report-connection source dest\n";
     }
 
     my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",

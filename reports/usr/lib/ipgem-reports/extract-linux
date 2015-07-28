@@ -19,7 +19,7 @@ use DBI;
 # Date <= 4 w
 # Proto != ICMP
 
-my $CONF = '/etc/ipgem-rp/extract.conf';
+my $CONF = '/etc/ipgem-reports/extract.conf';
 unless ( my $do_ret = do $CONF )
 {
    warn "couldn't parse $CONF: $@" if $@;

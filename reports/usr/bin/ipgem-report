@@ -2,7 +2,7 @@
 
 set -e -u
 
-cd /etc/ipgem-rp
+cd /etc/ipgem-reports
 for script in run/[0-9][0-9]-*; do
     if [ -x "$script" ]; then
         echo "# Executing $script"

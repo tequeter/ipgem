@@ -10,7 +10,7 @@ use DateTime::Format::Strptime;
 use Net::DNS::Resolver;
 
 my $VERSION = 1.000;
-my $LOCAL_RESOLVER = '/etc/ipgem-gw/resolver';
+my $LOCAL_RESOLVER = '/etc/ipgem-gateway/resolver';
 
 # copy-paste from extract-linux.pl
 my $date_input_ref = DateTime::Format::Strptime->new(

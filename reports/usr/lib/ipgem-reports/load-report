@@ -8,7 +8,7 @@ use DateTime::Format::Strptime;
 use Text::CSV;
 use DBI;
 
-my $CONF = '/etc/ipgem-rp/load.conf';
+my $CONF = '/etc/ipgem-reports/load.conf';
 unless ( my $do_ret = do $CONF )
 {
    warn "couldn't parse $CONF: $@" if $@;
@@ -53,13 +53,13 @@ sub main
     my $db_digest_ref;
     my $csv_ref = Text::CSV->new( { binary => 1, sep_char => ';', eol => "\r\n", } );
 
-    if ( scalar @ARGV && -e "/etc/ipgem-rp/load-$ARGV[0].sql" )
+    if ( scalar @ARGV && -e "/etc/ipgem-reports/load-$ARGV[0].sql" )
     {
-        my $columns_conf = slurp( "/etc/ipgem-rp/load-$ARGV[0].columns" );
+        my $columns_conf = slurp( "/etc/ipgem-reports/load-$ARGV[0].columns" );
         my @columns = split /\s+/, $columns_conf;
 
         $csv_ref->print( \*STDOUT, \@columns );
-        $db_digest_ref = $dbh_ref->prepare( slurp( "/etc/ipgem-rp/load-$ARGV[0].sql" ) );
+        $db_digest_ref = $dbh_ref->prepare( slurp( "/etc/ipgem-reports/load-$ARGV[0].sql" ) );
 
         extract_data( $dbh_ref, $db_digest_ref, $csv_ref );
     }

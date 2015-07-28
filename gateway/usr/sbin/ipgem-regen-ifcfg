@@ -2,10 +2,10 @@
 
 set -e -u
 
-. /etc/ipgem-gw/networking
+. /etc/ipgem-gateway/networking
 
 myname="$( basename "$0" )"
-hosts=/etc/ipgroup/hosts
+hosts=/etc/ipgem-gateway/hosts
 now="$( date '+%F %T')"
 declare -a ifmac=()
 ifcfg=/etc/sysconfig/network-scripts

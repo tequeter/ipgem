@@ -6,7 +6,7 @@ use warnings;
 use POSIX;
 use DBI;
 
-my $CONF = '/etc/ipgem-rp/classify.conf';
+my $CONF = '/etc/ipgem-reports/classify.conf';
 unless ( my $do_ret = do $CONF )
 {
    warn "couldn't parse $CONF: $@" if $@;
