@@ -29,6 +29,7 @@ cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gw/
 cp -a reports/* $RPM_BUILD_ROOT/
 ( cd reports/usr/lib/ipgem-rp/steps/ && for f in *; do ln -sf "/usr/lib/ipgem-rp/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-rp/steps/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-rp
+mkdir -p $RPM_BUILD_ROOT/var/lib/ipgem/reports
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-rp/
 
 
@@ -106,6 +107,7 @@ out which clients are still misconfigured.
                                 /usr/bin/ipgem-weekly-stats
                                 /usr/bin/ipgem-rp-load-connection
                                 /usr/bin/ipgem-report
+                                /var/lib/ipgem/reports
 
 
 

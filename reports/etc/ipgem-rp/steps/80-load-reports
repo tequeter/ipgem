@@ -1,6 +1,6 @@
 #!/bin/bash
 
-out=/srv/ipgem-rp
+out=/var/lib/ipgem/reports
 date="$( date +%F )"
 
 /usr/lib/ipgem-rp/load-report connections  >"$out/ipgem-connections-$date.csv"

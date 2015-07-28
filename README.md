@@ -176,7 +176,7 @@ on what to fix.
     /etc/ipgem-rp/reports     -- SQL for each report
     /usr/lib/ipgem-rp         -- Internals
     /usr/bin                  -- User-facing scripts
-    /srv/ipgem-rp             -- Result files (CSV)
+    /var/lib/ipgem/reports    -- Result files (CSV)
     /var/cache/ipgem/logs/TYPE/HOST/ -- Local copy of the gateway logs
 
 ### Getting Logs to the Report Host
@@ -193,8 +193,8 @@ gateway(s) into `/var/cache/ipgem/logs/TYPE/HOST/`, which TYPE one of:
 
 `/usr/bin/ipgem-report` runs scripts in `/etc/ipgem-rp/steps`, extracting the
 raw logs into a temporary SQLite database, and (after some work) loading the
-end results into CSV files in `/srv/ipgem-rp` (reports that you can open in
-Excel).
+end results into CSV files in `/var/lib/ipgem/reports` (reports that you can
+open in Excel).
 
 You can customize this heavily to fit your needs:
 - Edit log filters in `/etc/ipgem-rp/extract.conf`.
