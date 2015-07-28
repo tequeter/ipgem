@@ -8,5 +8,7 @@
 # Declare which interfaces to use as IP gateways
 # Do NOT include the administrative interface here
 declare -a IFNAME=( 'eth1' )
+# For each IFNAME, add here the network prefix
+declare -a IFPREFIX=( '255.255.255.0' )
 # For each IFNAME, add here a regexp matching IPs to impersonate in /etc/ipgem-gateway/hosts
 declare -a IFNET_RE=( '^192\.168\.20\.' )

@@ -21,7 +21,7 @@ grep -v '^#' "$hosts" |grep '[0-9]' |while read name oldip newip; do
 	# Figure out which eth to use for this host
 	ifidx=
 	for i in "${!IFNAME[@]}"; do
-		if echo $oldip |fgrep -q "${IFNET_RE[$i]}"; then
+		if echo $oldip |grep -qE "${IFNET_RE[$i]}"; then
 			ifidx=$i
 			break
 		fi
@@ -41,7 +41,7 @@ BOOTPROTO=static
 DHCPCLASS=
 HWADDR=${ifmac[$ifidx]}
 IPADDR=$oldip
-NETMASK=255.255.255.0
+PREFIX=${IFPREFIX[$ifidx]}
 ONBOOT=yes
 EOF
 	else
