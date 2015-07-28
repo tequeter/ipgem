@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use POSIX;
+use DateTime;
+use DateTime::Duration;
+use DateTime::Format::Strptime;
+use DBI;
+
+# Input
+# May 23 09:37:12 SRVIPGPAL kernel: oldname/newname IN=eth1 OUT= MAC=00:50:56:bf:00:0b:44:d3:ca:54:46:50:08:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=60 TOS=0x00 PREC=0x00 TTL=62 ID=36789 DF PROTO=TCP SPT=39114 DPT=666 WINDOW=5840 RES=0x00 SYN URGP=0
+
+# Desired output
+# May 23 09:37:12    SRVIPGPAL    oldname/newname    1.1.1.1    2.2.2.2    TCP    666
+
+# Filter
+# Date <= 4 w
+# Proto != ICMP
+
+my $CONF = '/etc/ipgem-rp/extract.conf';
+unless ( my $do_ret = do $CONF )
+{
+   warn "couldn't parse $CONF: $@" if $@;
+   warn "couldn't do $CONF: $!"    unless defined $do_ret;
+   warn "couldn't run $CONF"       unless $do_ret;
+}
+
+my $date_input_ref = DateTime::Format::Strptime->new(
+    pattern =>    '%Y %b%n%d %T',
+    locale  =>   'C',
+    time_zone => $LOG_TZ,
+    on_error =>  'croak',
+);
+
+sub parse_date
+{
+    my ( $datestr ) = @_;
+
+    # We have no date in the log. Try first with this year
+    my $year = POSIX::strftime( '%Y' , localtime time );
+    my $date_ref = $date_input_ref->parse_datetime( "$year $datestr" );
+
+    if ( $date_ref < DateTime->now() )
+    {
+        return $date_ref;
+    }
+    else
+    {
+        $year--;
+        $date_ref = $date_input_ref->parse_datetime( "$year $datestr" );
+        return $date_ref;
+    }
+}
+
+sub load_data
+{
+    my ( $dbh_ref, $db_insert_ref ) = @_;
+
+    my $date_start_ref = DateTime->now() - DateTime::Duration->new( weeks => $WEEKS_OF_LINUX_LOGS );
+
+    FILE: foreach my $file ( @ARGV )
+    {
+        open my $fh_ref, '<', $file or die "Can't open $file: $!";
+        LINE: while ( readline $fh_ref )
+        {
+            chomp;
+            if ( my ( $datestr, $host, $desc, $src, $dst, $proto, $dport, $icmp ) = /^
+                (\w{3} \s+ \d{1,2} \s [0-9:]{8}) \s+    # May 23 09:37:12
+                ([A-Z-]+) \s+                           # SRVIPGPAL
+                kernel: \s (\S+) \s+                    # oldname-newname
+                IN=\S* \s+ OUT=\S* \s+ MAC=\S* \s+
+                SRC=(\S+) \s+ DST=(\S+) \s+             # SRC=1.1.1.1 DST=2.2.2.2
+                LEN=\d+ \s+ TOS=\S+ \s+ PREC=\S+ \s+ TTL=\S+ \s+ ID=\S+ \s+ (?:DF \s+)?
+                PROTO=(?:(TCP|UDP) \s SPT=\d+ \s DPT=(\d+) # PROTO=UDP SPT=137 DPT=137 LEN=58
+                    |(\w+) )                            # PROTO=ICMP TYPE=8 CODE=0 ID=60937 SEQ=2
+                /xms )
+            {
+                if ( !defined $proto )
+                {
+                    $proto = $icmp;
+                }
+                my $date_ref = parse_date( $datestr );
+                if ( $date_ref < $date_start_ref )
+                {
+                    # Skipping, too old
+                    next LINE;
+                }
+
+                if ( exists $IGNORE_PROTO{$proto}
+                    || exists $IGNORE_SRC{$src}
+                    || exists $IGNORE_DST{$dst} )
+                {
+                    next LINE;
+                }
+
+                my $datesql = $date_ref->epoch();
+                $db_insert_ref->execute( $datesql, $host, $desc, $src, $dst, $proto, $dport );
+            }
+            else
+            {
+                print STDERR "Unable to parse line $file:$.\n";
+            }
+        }
+    }
+    $dbh_ref->commit();
+
+    return 1;
+}
+
+sub main
+{
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $db_insert_ref = $dbh_ref->prepare( 'INSERT INTO log (date, host, desc, src, dst, proto, dport) VALUES(?, ?, ?, ?, ?, ?, ?)' );
+    load_data( $dbh_ref, $db_insert_ref );
+}
+
+main();
+
+1;

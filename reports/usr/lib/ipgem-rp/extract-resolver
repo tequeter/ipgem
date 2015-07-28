@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DBI;
+
+# We expect TSV files with a bunch of valid-until-ip-name records.
+# These records are sorted by their valid non-unique field.
+# Typically, the resolver process will go through the relay logs every
+# X hours and log the results into the TSV, thus producing records grouped
+# by "valid".
+
+sub flush_cache
+{
+    my ( $entries_ref, $db_insert_ref ) = @_;
+
+    while ( my ( $ip, $data_ref ) = each %$entries_ref )
+    {
+        my ( $valid, $until, $name ) = @$data_ref;
+        $db_insert_ref->execute( $valid, $until, $ip, $name );
+    }
+
+    %$entries_ref = ();
+}
+
+sub main
+{
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $db_insert_ref = $dbh_ref->prepare( 'INSERT INTO dns VALUES(?, ?, ?, ?)' );
+
+    my $current = 0; # Current $valid value
+    my %entries; # $ip => $name
+
+    FILE: foreach my $file ( @ARGV )
+    {
+        open my $fh_ref, '<', $file or die "Can't open $file: $!";
+        LINE: while ( readline $fh_ref )
+        {
+            chomp;
+            my ( $valid, $until, $ip, $name ) = split /\t/;
+            if ( !$valid || !$until || !$ip || !$name )
+            {
+                print STDERR "invalid line at $file:$.: $_\n";
+                next LINE;
+            }
+
+            if ( $valid != $current )
+            {
+                flush_cache( \%entries, $db_insert_ref );
+            }
+            $entries{$ip} = [ $valid, $until, $name ];
+            $current = $valid;
+        }
+    }
+
+    flush_cache( \%entries, $db_insert_ref );
+    $dbh_ref->commit();
+    1;
+}
+
+main;

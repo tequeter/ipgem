@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use POSIX;
+use DateTime;
+use DateTime::Duration;
+use DateTime::Format::ISO8601;
+use DBI;
+
+my $CONF = '/etc/ipgem-rp/extract.conf';
+unless ( my $do_ret = do $CONF )
+{
+   warn "couldn't parse $CONF: $@" if $@;
+   warn "couldn't do $CONF: $!"    unless defined $do_ret;
+   warn "couldn't run $CONF"       unless $do_ret;
+}
+
+# Jun 15 03:32:01 10.251.8.253 1 2013-06-15T03:32:02.027+02:00 IDG-CFW-SEC-01 RT_FLOW - RT_FLOW_SESSION_CREATE [junos@2636.1.1.1.2.86 source-address="1.1.1.1" source-port="32247" destination-address="2.2.2.2" destination-port="666" service-name="icmp" nat-source-address="1.1.1.1" nat-source-port="32247" nat-destination-address="2.2.2.2" nat-destination-port="666" src-nat-rule-name="None" dst-nat-rule-name="None" protocol-id="1" policy-name="10" source-zone-name="Z-WAN" destination-zone-name="Z-PRD" session-id-32="4882" username="N/A" roles="N/A" packet-incoming-interface="reth0.0"] session created 1.1.1.1/32247->2.2.2.2/2968 icmp 1.1.1.1/32247->2.2.2.2/2968 None None 1 10 Z-WAN Z-PRD 4882 N/A(N/A) reth0.0
+
+sub load_data
+{
+    my ( $dbh_ref, $db_insert_ref ) = @_;
+
+    my $date_start_ref = DateTime->now() - DateTime::Duration->new( weeks => 4 );
+    my %proto_name = ( 17 => 'UDP', 6 => 'TCP', 1 => 'ICMP' );
+
+    FILE: foreach my $file ( @ARGV )
+    {
+        open my $fh_ref, '<', $file or die "Can't open $file: $!";
+        LINE: while ( readline $fh_ref )
+        {
+            chomp;
+            if ( my ( $stddate, $host, $operation, $techmsg, $msg, $othersvc ) = /^
+                \w+ \s+ \d+ \s [\d:]+ \s [\d.]+ \s \d+  # Jun 15 03:32:01 10.251.8.253 1
+                \s+ ([\d-]+ T [\d:.]+ \+ [\d:]+)        # 2013-06-15T03:32:02.027+02:00
+                \s+ ([\w-]+)                            # IDG-CFW-SEC-01
+                \s+ (?: RT_FLOW                         # Service, RT_FLOW -> then parse
+                    \s+ - \s+ (\w+)                         # - RT_FLOW_SESSION_CREATE
+                    \s+ \[junos@\S+ ([^\]]+) \]             # [junos@2636.1.1.1.2.86 ...]
+                    \s+ (.*)
+                    $
+                |
+                    (\S+) \s (?: \d+ | - ) \s           # else (svc pid ...) -> capture the service name
+                ) /xms )
+            {
+                if ( $othersvc || $operation ne 'RT_FLOW_SESSION_CREATE' )
+                {
+                    next LINE;
+                }
+
+                my %pairs;
+                while ( $techmsg =~ /\s+ ([\w-]+) =" ([^"]+) "/xmsg )
+                {
+                    $pairs{$1} = $2;
+                }
+                my ( $src, $dst, $proto, $dport, $rulename, $src_zone ) = @pairs{
+                    qw( source-address destination-address protocol-id destination-port dst-nat-rule-name source-zone-name ) };
+                $proto = $proto_name{$proto} if exists $proto_name{$proto};
+                if ( !$src || !$dst || !defined $proto || !defined $dport )
+                {
+                    print STDERR "Missing src ($src), dst ($dst), proto ($proto) or dport ($dport) in $file:$.\n";
+                    next LINE;
+                }
+                elsif ( !$pairs{'nat-destination-address'} || $pairs{'nat-destination-address'} eq $dst )
+                {
+                    next LINE; # Not NATted
+                }
+                elsif ( exists $IGNORE_PROTO{$proto}
+                    || exists $IGNORE_SRC{$src}
+                    || exists $IGNORE_DST{$dst}
+                    || exists $IGNORE_SRX_SRC_ZONE{$src_zone} )
+                {
+                    next LINE;
+                }
+
+                my $date_ref = DateTime::Format::ISO8601->parse_datetime( $stddate );
+                if ( $date_ref < $date_start_ref )
+                {
+                    next LINE; # Skipping, too old
+                }
+
+                my $datesql = $date_ref->epoch();
+                #print           "INSERT $datesql, $host, '', $src, $dst, $proto, $dport\n";
+                $db_insert_ref->execute( $datesql, $host, '', $src, $dst, $proto, $dport );
+            }
+            else
+            {
+                print STDERR "Unable to parse line $file:$.\n";
+            }
+        }
+    }
+    #$dbh_ref->commit();
+
+    return 1;
+}
+
+sub main
+{
+    # Autocommit set to 1 because SQLite doesn't cope well with concurrent transactions
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 1 } );
+    my $db_insert_ref = $dbh_ref->prepare( 'INSERT INTO log (date, host, desc, src, dst, proto, dport) VALUES(?, ?, ?, ?, ?, ?, ?)' );
+    load_data( $dbh_ref, $db_insert_ref );
+}
+
+main();
+
+1;

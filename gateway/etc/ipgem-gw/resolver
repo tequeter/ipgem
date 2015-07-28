@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+# This Perl source file will be included by ipgem-resolver through 'do'.
+#
+# It must define a local_name_for( $ip ) function, which may provide a name
+# for IPGEM clients before a DNS reverse resolution is attempted. The function
+# must "return;" (undef) for IPs that need no special treatment.
+
+use strict;
+use warnings;
+
+sub site_name_for
+{
+    my ( $ip ) = @_;
+
+    # Implement here your specific rules for resolving names that are not found
+    # in the DNS
+
+    return; # No specific name for this IP
+    # Or
+    #return 'somename'; # Found
+}
+
+1;

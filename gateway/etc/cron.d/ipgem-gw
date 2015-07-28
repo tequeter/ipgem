@@ -1,0 +1,1 @@
+0 * * * * root /usr/local/bin/ipgem-resolver 1 /var/log/ipgem /var/log/ipgem.1 >>/var/log/ipgem-resolver 2>&1

@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DateTime;
+use DateTime::Format::Strptime;
+use Text::CSV;
+use DBI;
+
+my $CONF = '/etc/ipgem-rp/load.conf';
+unless ( my $do_ret = do $CONF )
+{
+   warn "couldn't parse $CONF: $@" if $@;
+   warn "couldn't do $CONF: $!"    unless defined $do_ret;
+   warn "couldn't run $CONF"       unless $do_ret;
+}
+
+my $query = <<'EOF';
+SELECT date, host, src, srcname, desc, dst, proto, dport, typology
+    FROM resolved_log
+    WHERE src=? AND dst=?
+EOF
+
+my $date_output_ref = DateTime::Format::Strptime->new(
+    pattern =>   '%F %T',
+    locale  =>   'C',
+    time_zone => $TIMEZONE,
+    on_error =>  'croak',
+);
+
+sub main
+{
+    if ( @ARGV != 2 )
+    {
+        die "Syntax: ipgem-rp-load-connection source dest\n";
+    }
+
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $db_digest_ref;
+    my $csv_ref = Text::CSV->new( { binary => 1, sep_char => ';', eol => "\r\n", } );
+
+    $csv_ref->print( \*STDOUT, [ qw( Date Relais
+        Source NomSource NomDestination Destination Protocole PortDestination Typologie ) ] );
+    $db_digest_ref = $dbh_ref->prepare( $query );
+    $db_digest_ref->execute( $ARGV[0], $ARGV[1] );
+
+    while ( my $data_ref = $db_digest_ref->fetchrow_arrayref() )
+    {
+        my $date_ref = DateTime->from_epoch( epoch => $data_ref->[0], time_zone => $TIMEZONE );
+        $data_ref->[0] = $date_output_ref->format_datetime( $date_ref );
+        $csv_ref->print( \*STDOUT, $data_ref );
+    }
+
+    return 1;
+}
+
+main();

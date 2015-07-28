@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use POSIX;
+use DateTime;
+use DateTime::Duration;
+use DateTime::Format::Strptime;
+use Net::DNS::Resolver;
+
+my $VERSION = 1.000;
+my $LOCAL_RESOLVER = '/etc/ipgem-gw/resolver';
+
+# copy-paste from extract-linux.pl
+my $date_input_ref = DateTime::Format::Strptime->new(
+    pattern =>    '%Y %b%n%d %T',
+    locale  =>   'C',
+    time_zone => 'local',
+    on_error =>  'croak',
+);
+sub parse_date
+{
+    my ( $datestr ) = @_;
+
+    # We have no date in the log. Try first with this year
+    my $year = POSIX::strftime( '%Y' , localtime time );
+    my $date_ref = $date_input_ref->parse_datetime( "$year $datestr" );
+
+    if ( $date_ref < DateTime->now() )
+    {
+        return $date_ref;
+    }
+    else
+    {
+        $year--;
+        $date_ref = $date_input_ref->parse_datetime( "$year $datestr" );
+        return $date_ref;
+    }
+}
+# end copy-paste
+
+sub main
+{
+    my $valid_hours = shift @ARGV;
+    if ( !$valid_hours || $valid_hours !~ /^\d+$/ )
+    {
+        print STDERR "Usage: ipgem-resolver hours_to_resolve log1 log2...\n";
+        exit 1;
+    }
+
+    my %cache;
+    my $date_end_ref = DateTime->now();
+    my $date_start_ref = $date_end_ref - DateTime::Duration->new( hours => $valid_hours );
+
+    FILE: foreach my $file ( @ARGV )
+    {
+        open my $fh_ref, '<', $file or die "Can't open $file: $!";
+        LINE: while ( readline $fh_ref )
+        {
+            chomp;
+            if ( my ( $datestr, $src, ) = /^
+                (\w{3} \s+ \d{1,2} \s [0-9:]{8}) \s+    # May 23 09:37:12
+                .*? \s SRC=(\S+) \s
+                /xms )
+            {
+                if ( exists $cache{$src} )
+                {
+                    next LINE;
+                }
+
+                my $date_ref = parse_date( $datestr );
+                if ( $date_ref < $date_start_ref )
+                {
+                    next LINE;
+                }
+
+                $cache{$src} = 0;
+            }
+        }
+    }
+
+    my $dns_ref = Net::DNS::Resolver->new(
+        retrans => 5,
+        retry   => 1, );
+    foreach my $ip ( keys %cache )
+    {
+        $cache{$ip} = $dns_ref->bgsend( $ip );
+    }
+    sleep 5;
+    foreach my $ip ( keys %cache )
+    {
+        my $name;
+        if ( $dns_ref->bgisready( $cache{$ip} ) )
+        {
+            my $answer_pkt_ref = $dns_ref->bgread( $cache{$ip} );
+            if ( my @answers = $answer_pkt_ref->answer() )
+            {
+                ANSWER: foreach my $answer_ref ( @answers )
+                {
+                    if ( $answer_ref->type() eq 'PTR' )
+                    {
+                        $name = $answer_ref->ptrdname();
+                        last ANSWER;
+                    }
+                }
+            }
+        }
+        if ( $name )
+        {
+            $cache{$ip} = $name;
+        }
+        elsif ( my $magname = magname_for( $ip ) )
+        {
+            $cache{$ip} = $magname;
+        }
+        else
+        {
+            delete $cache{$ip};
+        }
+    }
+
+    while ( my ( $ip, $name ) = each %cache )
+    {
+        printf "%d\t%d\t%s\t%s\n",
+            $date_start_ref->epoch(),
+            $date_end_ref->epoch(),
+            $ip,
+            $name;
+    }
+
+    1;
+}
+
+# Include the site-local, configurable resolver in top context.
+unless ( my $local_res_ret = do $LOCAL_RESOLVER )
+{
+   warn "couldn't parse $LOCAL_RESOLVER: $@" if $@;
+   warn "couldn't do $LOCAL_RESOLVER: $!"    unless defined $local_res_ret;
+   warn "couldn't run $LOCAL_RESOLVER"       unless $local_res_ret;
+}
+
+
+main;

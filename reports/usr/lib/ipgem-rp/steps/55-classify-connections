@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use POSIX;
+use DBI;
+
+my $CONF = '/etc/ipgem-rp/classify.conf';
+unless ( my $do_ret = do $CONF )
+{
+   warn "couldn't parse $CONF: $@" if $@;
+   warn "couldn't do $CONF: $!"    unless defined $do_ret;
+   warn "couldn't run $CONF"       unless $do_ret;
+}
+
+sub main
+{
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $select_ref = $dbh_ref->prepare( 'SELECT log_id, host, src, srcname, dst, desc FROM resolved_log' );
+    my $update_ref = $dbh_ref->prepare( 'UPDATE log SET typology=? WHERE rowid = ?' );
+
+    # This kind of whole-table loop would be horribly inefficient, but SQLite
+    # is really too limited to implement this filter easily DB-side.
+    # Fortunately, for this engine it doesn't matter much as everything
+    # happens inside the same process.
+    $select_ref->execute();
+    while ( my $data_ref = $select_ref->fetchrow_arrayref() )
+    {
+        my ( $id ) = @$data_ref;
+        my $typo = classify_connection( @$data_ref );
+        $update_ref->execute( $typo, $id );
+    }
+
+    return $dbh_ref->commit();
+}
+
+main;
+
+1;

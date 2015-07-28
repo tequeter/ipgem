@@ -1,0 +1,30 @@
+#!/bin/bash
+
+prefix=/etc/ipgroup/iptables.prefix
+suffix=/etc/ipgroup/iptables.suffix
+hosts=/etc/ipgroup/hosts
+
+echo "# BEGIN $prefix"
+echo
+cat "$prefix"
+echo "# END $prefix"
+echo
+echo
+echo "# BEGIN Ipgroup rules generated from $hosts at $( date '+%F %T')"
+echo
+grep -v '^#' "$hosts" |grep '[0-9]' |while read name oldip newip; do
+	shortname="$( echo $name |tr -d '"' |cut -b1-28 )"
+	echo "# $oldip -> $newip ($name)"
+	echo "-A PREROUTING -d $oldip -j LOG --log-level debug --log-prefix \"$shortname \""
+	echo "-A PREROUTING -d $oldip -j DNAT --to-destination $newip"
+	echo "-A POSTROUTING -d $newip -j SNAT --to-source $oldip"
+done
+echo
+echo "# END Ipgroup rules"
+echo
+echo
+echo "# BEGIN $prefix"
+echo
+cat "$suffix"
+echo
+echo "# END $suffix"

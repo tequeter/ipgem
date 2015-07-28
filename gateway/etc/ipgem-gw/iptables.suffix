@@ -1,0 +1,13 @@
+# This is an iptables-save(1) fragment.
+#
+# The contents of this file will be interpreted after the IPGEM rules.
+# It's typically used to discard traffic from specific sources without
+# polluting the logs.
+
+# This line is required (commits the IPGEM rules)
+COMMIT
+
+# Add filter rules here if you wish (they'll show up in the IPGEM logs)
+*filter
+
+COMMIT

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e -u
+
+linuxgateways=localhost
+
+for host in $linuxgateways; do
+    if [ "$host" = "localhost" ]; then
+        # This special case avoids setting up SSH keys in simple configurations
+        rsync -a /var/log/ipgem /var/log/ipgem.* /var/cache/ipgem/logs/linux/$host/
+        rsync -a /var/log/ipgem-resolver* /var/cache/ipgem/logs/resolver/$host/
+    else
+        rsync -az $host:'/var/log/ipgem /var/log/ipgem.*' /var/cache/ipgem/logs/linux/$host/
+        rsync -az $host:'/var/log/ipgem-resolver*' /var/cache/ipgem/logs/resolver/$host/
+    fi
+done
+

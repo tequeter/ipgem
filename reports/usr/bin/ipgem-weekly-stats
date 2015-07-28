@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DBI;
+use DateTime;
+use DateTime::Format::Strptime;
+
+# http://stackoverflow.com/questions/9423087/
+sub first_day_of_week
+{
+  my ( $year, $week ) = @_;
+
+  # Week 1 is defined as the one containing January 4:
+  DateTime
+    ->new( year => $year, month => 1, day => 4 )
+    ->add( weeks => ($week - 1) )
+    ->truncate( to => 'week' );
+}
+
+sub slurp
+{
+    my ( $filename ) = @_;
+    open my $fh_ref, '<', $filename or die "Cannot open for reading $filename: $!\n";
+    local $/;
+    return readline $fh_ref;
+}
+
+
+sub main
+{
+    my ( $year, $week ) = @ARGV;
+    if ( !$week || !$year || "$year$week" !~ /^\d+$/ )
+    {
+        print STDERR "Usage: $0 year weeknumber\n";
+        exit 1;
+    }
+
+    my $start = first_day_of_week( $year, $week )->epoch();
+    my $end = first_day_of_week( $year, $week + 1 )->epoch();
+
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+
+    my $sth_ref = $dbh_ref->prepare( 'SELECT COUNT(*) FROM log WHERE date >= ? AND date < ?' );
+    $sth_ref->execute( $start, $end );
+    my $connections = ($sth_ref->fetchrow_array())[0];
+
+    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-rp/weekly-stats-uconn.sql' ) );
+    $sth_ref->execute( $start, $end );
+    my $uniques = ($sth_ref->fetchrow_array())[0];
+
+    $sth_ref = $dbh_ref->prepare( slurp( '/etc/ipgem-rp/weekly-stats-todo.sql' ) );
+    $sth_ref->execute( $start, $end, $start, $end );
+    my $todo_ref = $sth_ref->fetchall_arrayref();
+    my $total_todo = 0;
+    my $cellfmt = q{%-12s};
+    my $todo_detail = sprintf $cellfmt, 'Week';
+    foreach my $typo_ref ( @$todo_ref )
+    {
+        $todo_detail .= sprintf $cellfmt, $typo_ref->[0];
+    }
+    $todo_detail .= "\n" . sprintf $cellfmt, "S$week";
+    foreach my $typo_ref ( @$todo_ref )
+    {
+        $todo_detail .= sprintf $cellfmt, $typo_ref->[1];
+        $total_todo += $typo_ref->[1];
+    }
+    $todo_detail .= "\n";
+
+    print "Stats for $year-S$week: $connections connections, $uniques unique connections, $total_todo todo to correct.\n";
+    print "For Excel copy-paste: S$week $connections $uniques $total_todo\n";
+    print "\n";
+    print "Todo details:\n$todo_detail";
+
+    exit 0;
+}
+
+main();

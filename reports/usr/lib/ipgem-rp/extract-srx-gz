@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e -u
+
+mydir="$( dirname "$0" )"
+"$mydir"/extract-srx.pl <( zcat "$1" )

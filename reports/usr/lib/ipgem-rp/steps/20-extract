@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e -u
+
+# Extract logs from /var/cache/ipgem/logs/TYPE/HOST/logfile.1
+# using extract-TYPE in the current directory (presumably feeding
+# it into the work database).
+
+for type in $( ls /var/cache/ipgem/logs/ ); do
+    extractor="./extract-$type"
+    if [ -x "$extractor" ]; then
+        echo "## Extractings $type logs"
+        find "/var/cache/ipgem/logs/$type/" -type f \
+            |sort \
+            |xargs -n 1 -P 3 -t "$extractor"
+    else
+        echo "Don't know how to extract data from logs of type $type"
+        exit 1
+    fi
+done
+

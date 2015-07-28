@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# This is a bash shell fragment containing configuration for ipgem scripts
+
+# Which interface has the administrative IP
+#ADMIN_IFACE=eth0
+
+# Declare which interfaces to use as IP gateways
+# Do NOT include the administrative interface here
+declare -a IFNAME=( 'eth1' )
+# For each IFNAME, add here a regexp matching IPs to impersonate in /etc/ipgem-gw/hosts
+declare -a IFNET_RE=( '^192\.168\.20\.' )

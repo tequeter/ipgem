@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DateTime;
+use DateTime::Format::Strptime;
+use Text::CSV;
+use DBI;
+
+my $CONF = '/etc/ipgem-rp/load.conf';
+unless ( my $do_ret = do $CONF )
+{
+   warn "couldn't parse $CONF: $@" if $@;
+   warn "couldn't do $CONF: $!"    unless defined $do_ret;
+   warn "couldn't run $CONF"       unless $do_ret;
+}
+
+sub extract_data
+{
+    my ( $dbh_ref, $db_digest_ref, $csv_ref ) = @_;
+
+    my $date_output_ref = DateTime::Format::Strptime->new(
+        pattern =>    '%F %T',
+        locale  =>   'C',
+        time_zone => $TIMEZONE,
+        on_error =>  'croak',
+    );
+
+    $db_digest_ref->execute();
+    while ( my $data_ref = $db_digest_ref->fetchrow_arrayref() )
+    {
+        my $date_ref = DateTime->from_epoch( epoch => $data_ref->[0], time_zone => $TIMEZONE );
+        $data_ref->[0] = $date_output_ref->format_datetime( $date_ref );
+        $csv_ref->print( \*STDOUT, $data_ref );
+    }
+
+    return 1;
+}
+
+sub slurp
+{
+    my ( $filename ) = @_;
+    open my $fh_ref, '<', $filename or die "Cannot open for reading $filename: $!\n";
+    local $/;
+    return readline $fh_ref;
+}
+
+sub main
+{
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $db_digest_ref;
+    my $csv_ref = Text::CSV->new( { binary => 1, sep_char => ';', eol => "\r\n", } );
+
+    if ( scalar @ARGV && -e "/etc/ipgem-rp/load-$ARGV[0].sql" )
+    {
+        my $columns_conf = slurp( "/etc/ipgem-rp/load-$ARGV[0].columns" );
+        my @columns = split /\s+/, $columns_conf;
+
+        $csv_ref->print( \*STDOUT, \@columns );
+        $db_digest_ref = $dbh_ref->prepare( slurp( "/etc/ipgem-rp/load-$ARGV[0].sql" ) );
+
+        extract_data( $dbh_ref, $db_digest_ref, $csv_ref );
+    }
+    else
+    {
+        print STDERR "Usage: $0 destinations|sources|connections|todo|...\n";
+        exit 1;
+    }
+
+
+    return 1;
+}
+
+main();
+
+1;
