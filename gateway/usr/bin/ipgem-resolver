@@ -55,7 +55,7 @@ sub main
 
     FILE: foreach my $file ( @ARGV )
     {
-        open my $fh_ref, '<', $file or die "Can't open $file: $!";
+        open my $fh_ref, '<', $file or die "Can't open $file: $!\n";
         LINE: while ( readline $fh_ref )
         {
             chomp;
@@ -106,13 +106,13 @@ sub main
                 }
             }
         }
-        if ( $name )
+        if ( my $sitename = site_name_for( $ip ) )
+        {
+            $cache{$ip} = $sitename;
+        }
+        elsif ( $name )
         {
             $cache{$ip} = $name;
-        }
-        elsif ( my $magname = magname_for( $ip ) )
-        {
-            $cache{$ip} = $magname;
         }
         else
         {
