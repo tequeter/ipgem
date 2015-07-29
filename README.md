@@ -181,13 +181,16 @@ changes will be preserved on package updates.
 
 ### File System Layout
 
-    /etc/ipgem-reports             -- All tunables should be here
-    /etc/ipgem-reports/steps       -- Called in order by ipgem-report (E, T, L)
-    /etc/ipgem-reports/reports     -- SQL for each report
-    /usr/lib/ipgem-reports         -- Internals
-    /usr/bin                  -- User-facing scripts
-    /var/lib/ipgem/reports    -- Result files (CSV)
-    /var/cache/ipgem/logs/TYPE/HOST/ -- Local copy of the gateway logs
+Path                             | Usage
+---------------------------------|------------------------------------------
+/etc/ipgem-reports               | All tunables should be here
+/etc/ipgem-reports/steps         | Called in order by ipgem-report (E, T, L)
+/etc/ipgem-reports/reports       | SQL for each report
+/usr/libexec/ipgem-reports       | Internals
+/usr/share/ipgem-reports         | Internals
+/usr/bin                         | User-facing scripts
+/var/lib/ipgem/reports           | Result files (CSV)
+/var/cache/ipgem/logs/TYPE/HOST/ | Local copy of the gateway logs
 
 ### Getting Logs to the Report Host
 

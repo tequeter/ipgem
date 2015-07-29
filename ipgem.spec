@@ -28,8 +28,8 @@ cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
 cp -a reports/* $RPM_BUILD_ROOT/
 mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/steps $RPM_BUILD_ROOT/etc/ipgem-reports/reports
-( cd reports/usr/lib/ipgem-reports/steps/ && for f in *; do ln -s "/usr/lib/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
-( cd reports/usr/lib/ipgem-reports/reports/ && for f in *; do ln -s "/usr/lib/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
+( cd reports/usr/libexec/ipgem-reports/steps/ && for f in *; do ln -s "/usr/libexec/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
+( cd reports/usr/share/ipgem-reports/reports/ && for f in *; do ln -s "/usr/share/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
 mkdir -p $RPM_BUILD_ROOT/var/lib/ipgem/reports
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
@@ -92,24 +92,24 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/reports/load-destinations.sql
 %config(noreplace)              /etc/ipgem-reports/get-logs
 %config(noreplace)              /etc/ipgem-reports/extract.conf
-                                /usr/lib/ipgem-reports/extract-linux
-                                /usr/lib/ipgem-reports/extract-resolver
-                                /usr/lib/ipgem-reports/steps/10-delete-database
-                                /usr/lib/ipgem-reports/steps/15-create-database.sql
-                                /usr/lib/ipgem-reports/steps/20-extract
-                                /usr/lib/ipgem-reports/steps/40-index-data.sql
-                                /usr/lib/ipgem-reports/steps/55-classify-connections
-                                /usr/lib/ipgem-reports/extract-srx
-                                /usr/lib/ipgem-reports/load-report
-                                /usr/lib/ipgem-reports/extract-srx-gz
-                                /usr/lib/ipgem-reports/reports/load-destinations.columns
-                                /usr/lib/ipgem-reports/reports/load-sources.sql
-                                /usr/lib/ipgem-reports/reports/load-todo.sql
-                                /usr/lib/ipgem-reports/reports/load-connections.columns
-                                /usr/lib/ipgem-reports/reports/load-todo.columns
-                                /usr/lib/ipgem-reports/reports/load-connections.sql
-                                /usr/lib/ipgem-reports/reports/load-sources.columns
-                                /usr/lib/ipgem-reports/reports/load-destinations.sql
+                                /usr/libexec/ipgem-reports/extract-linux
+                                /usr/libexec/ipgem-reports/extract-resolver
+                                /usr/libexec/ipgem-reports/steps/10-delete-database
+                                /usr/libexec/ipgem-reports/steps/15-create-database.sql
+                                /usr/libexec/ipgem-reports/steps/20-extract
+                                /usr/libexec/ipgem-reports/steps/40-index-data.sql
+                                /usr/libexec/ipgem-reports/steps/55-classify-connections
+                                /usr/libexec/ipgem-reports/extract-srx
+                                /usr/libexec/ipgem-reports/load-report
+                                /usr/libexec/ipgem-reports/extract-srx-gz
+                                /usr/share/ipgem-reports/reports/load-destinations.columns
+                                /usr/share/ipgem-reports/reports/load-sources.sql
+                                /usr/share/ipgem-reports/reports/load-todo.sql
+                                /usr/share/ipgem-reports/reports/load-connections.columns
+                                /usr/share/ipgem-reports/reports/load-todo.columns
+                                /usr/share/ipgem-reports/reports/load-connections.sql
+                                /usr/share/ipgem-reports/reports/load-sources.columns
+                                /usr/share/ipgem-reports/reports/load-destinations.sql
                                 /usr/bin/ipgem-weekly-stats
                                 /usr/bin/ipgem-report-connection
                                 /usr/bin/ipgem-report

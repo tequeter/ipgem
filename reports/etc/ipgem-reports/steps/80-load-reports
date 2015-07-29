@@ -3,8 +3,8 @@
 out=/var/lib/ipgem/reports
 date="$( date +%F )"
 
-/usr/lib/ipgem-reports/load-report connections  >"$out/ipgem-connections-$date.csv"
-/usr/lib/ipgem-reports/load-report sources      >"$out/ipgem-sources-$date.csv"
-/usr/lib/ipgem-reports/load-report destinations >"$out/ipgem-destinations-$date.csv"
-/usr/lib/ipgem-reports/load-report todo         >"$out/ipgem-todo-$date.csv"
+/usr/libexec/ipgem-reports/load-report connections  >"$out/ipgem-connections-$date.csv"
+/usr/libexec/ipgem-reports/load-report sources      >"$out/ipgem-sources-$date.csv"
+/usr/libexec/ipgem-reports/load-report destinations >"$out/ipgem-destinations-$date.csv"
+/usr/libexec/ipgem-reports/load-report todo         >"$out/ipgem-todo-$date.csv"
 
