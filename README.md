@@ -5,25 +5,29 @@ for Easy Migrations.
 
 ## How It Works
 
-The IPGEM gateway impersonates the previous IPs of your servers and forwards
+The IPGEM gateway impersonates the former IPs of your servers and forwards
 transparently all the traffic it receives to the new IPs. All the misconfigured
-scripts and applications (most notably using hard-coded IP addresses) still
-work and you can fix them at your leisure.
+scripts and applications (most notably those using hard-coded IP addresses)
+still work and you can fix them at your leisure.
 
 All the traffic that goes through IPGEM is logged, so that you know what you
 need to fix.
 
-The IPGEM gateway is implemented using the iptables DNAT target.
+The IPGEM gateway is implemented using the iptables NAT targets.
 
 ## Did You Test It?
 
 Yes! I successfully used this system at Idgroup to painlessly migrate dozens of
-servers in three distinct projects, and I'm in the planning phase for a
+servers in three distinct projects, and I'm making it reusable for a similar
 migration at Saint Maclou.
 
-This said, the software comes with no warranty of any kind: see the licence
+This said, this software comes with no warranty of any kind: see the licence
 below. You should only use it if you understand the implications. Contact me
 for consulting if you need further service.
+
+In particular, the published version that comes with this README is still being
+adapted to EL7 and there may be a few rough edges in the conversion from the
+quick solution initially written for Idgroup.
 
 ## What's Included in IPGEM
 
@@ -41,18 +45,19 @@ requires some knowledge of SQL and Perl.
 
 ### Gateway
 
-- A RHEL/CentOS 5 to 7 server (other releases should work too, but this is what
-  I used so far), preferably as a VM. I highly recommend to dedicate the host
-  to IPGEM.
-- The host must be configured with an English locale (en_US, en_GB, C, etc)!
-  This is required for parsing dates from the system logs.
+- A RHEL/CentOS 7 server (EL 5 may still work but is untested), preferably as a
+  VM. I highly recommend to dedicate the host to IPGEM, as it'll take over the
+  network configuration files.
+- The host must be configured with an English locale (`en_US`, `en_GB`, `C`,
+  etc)! This is required for parsing dates from the system logs.
 - An IP and NIC for IPGEM administration (distinct from the IPs to migrate).
 - A (virtual) network card in each network that contains IPs to migrate.
   VLANs could be used instead of whole NICs, but my administration scripts
-  don't support them yet (patches welcome).
+  don't support them yet (patches welcome) and it's not really useful in a
+  virtual environment anyway.
 - I recommend a dedicated 2 GB filesystem for /var/log, with room for
   expansion just in case (use a LVM).
-- Packages: perl perl-Datetime perl-DateTime-Format-Strptime perl-Net-DNS .
+- Enabled RHEL/CentOS (as appropriate) and EPEL repositories.
 
 ### Gateway (for small projects)
 
@@ -63,12 +68,25 @@ the IPGEM scripts) and use a single NIC for everything.
 
 ### Report Host
 
-- A RHEL/CentOS 5 to 7 server
+- A RHEL/CentOS 7 server (EL 5 may still work but is untested).
 - Enough space for 2 copies of the logs in /var/cache
-- Packages: perl perl-Datetime perl-DateTime-Format-Strptime perl-DBI
-  perl-DBD-SQLite sqlite perl-Text-CSV
+- Enabled RHEL/CentOS (as appropriate) and EPEL repositories.
 
 NB: it can be the same server as the gateway.
+
+## Installation
+
+- Check that you meet the requirements laid out above.
+- Enable the EPEL repositories: see
+  http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F .
+- Install the RPM packages `ipgem-gateway` and `ipgem-reports` on your
+  server(s).
+- Go through `/etc/ipgem-gateway/*` and `/etc/ipgem-reports/*`, adapt the
+  configuration as needed using the comments.
+- Enable the iptables service on the gateway.
+- Either reboot the gateway or:
+  - restart rsyslogd
+  - reapply the sysctl configuration with `sysctl -p --system`
 
 ## The Method
 
@@ -110,7 +128,7 @@ through the IPGEM gateway.
 1. Run and review IPGEM reports to identify misconfigured applications and
    scripts.
 2. Fix the configurations, wait for some days.
-3. Loop.
+3. Repeat.
 
 ### Finish
 
@@ -118,28 +136,16 @@ At some point, the traffic still going through the IPGEM will not be worth
 your time (caused by supervision tools, antivirus updates, ...) and you'll
 just pull the plug on IPGEM rather than trying to fix the last things.
 
-## Installation
-
-This software is packaged in RPM format (tested on CentOS 7). You'll need to
-enable the EPEL respository to resolve some dependencies.
-
-Alternatively, you may perform a manual installation by copying the scripts in
-the proper locations (make sure to preserve executable permissions). You'll
-still need to install packages for dependencies.
-
-There are two sets of scripts / packages: the gateway and the reports. They
-don't need to be on the same host.
-
 ## Administering the Gateway
 
 ### Initial Configuration
 
 Go through `/etc/ipgem-gateway/networking` and follow the instructions in the comments.
 
-There is a resolver that performs periodic name resolution for the client IPs
-that go through the IPGEM (this is useful for dynamic IPs, ie. PCs on DHCP). If
-you need to bypass the DNS for some IPs (such as a large network of shops not
-integrated in the DNS), edit the Perl code in `/etc/ipgem-gateway/resolver`.
+There is a resolver that performs periodic reverse name resolution for the
+client IPs that go through the IPGEM gateway (this is useful for dynamic IPs,
+ie. PCs on DHCP). If you need to bypass the DNS for some IPs, edit the Perl
+code in `/etc/ipgem-gateway/resolver`.
 
 ### Configuration During the Migration
 
@@ -168,6 +174,10 @@ You may want to stop relaying hosts or specific services at some point. Edit
 IPGEM comes with a set of scripts to analyze the logs: you don't want IPGEM
 to remain a SPOF in your information system for long, so you need information
 on what to fix.
+
+Everything under `/etc/ipgem-reports` is configurable, either as plain files or
+as symlinks that you can replace by your own files. Do tune as needed, your
+changes will be preserved on package updates.
 
 ### File System Layout
 
@@ -211,6 +221,10 @@ You can customize this heavily to fit your needs:
   destination.
 - `/usr/bin/ipgem-weekly-stats` produces a high-level report for a given week
   (amount of connections etc).
+
+## Caveats
+
+See https://github.com/tequeter/ipgem/issues/ .
 
 ## Author, Credits, and Licence
 
