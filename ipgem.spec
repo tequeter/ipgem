@@ -27,7 +27,9 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
 cp -a reports/* $RPM_BUILD_ROOT/
-( cd reports/usr/lib/ipgem-reports/steps/ && for f in *; do ln -sf "/usr/lib/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
+mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/steps $RPM_BUILD_ROOT/etc/ipgem-reports/reports
+( cd reports/usr/lib/ipgem-reports/steps/ && for f in *; do ln -s "/usr/lib/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
+( cd reports/usr/lib/ipgem-reports/reports/ && for f in *; do ln -s "/usr/lib/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
 mkdir -p $RPM_BUILD_ROOT/var/lib/ipgem/reports
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
@@ -35,7 +37,6 @@ cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
 
 %package gateway
 Summary:        Easy Server IPv4 Migration - Gateway component
-Requires:       rsync
 %{?el7:Requires: iptables-services}
 
 %description gateway
@@ -62,6 +63,7 @@ connections to the new IPs.
 
 %package reports
 Summary:        Easy Server IPv4 Migration - Reporting component
+Requires:       rsync, sqlite
 
 %description reports
 Install this package to produce CSV activity reports from a Gateway and find
