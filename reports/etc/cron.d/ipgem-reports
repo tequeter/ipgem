@@ -1,1 +1,1 @@
-0 8 * * * root /etc/ipgem-reports/get-logs && /usr/local/bin/ipgem-report >/dev/null
+0 8 * * * root /etc/ipgem-reports/get-logs && /usr/bin/ipgem-report >/dev/null
