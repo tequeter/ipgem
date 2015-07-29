@@ -189,7 +189,7 @@ Path                             | Usage
 /usr/libexec/ipgem-reports       | Internals
 /usr/share/ipgem-reports         | Internals
 /usr/bin                         | User-facing scripts
-/var/lib/ipgem/reports           | Result files (CSV)
+/srv/ipgem/reports               | Result files (CSV)
 /var/cache/ipgem/logs/TYPE/HOST/ | Local copy of the gateway logs
 
 ### Getting Logs to the Report Host
@@ -206,7 +206,7 @@ gateway(s) into `/var/cache/ipgem/logs/TYPE/HOST/`, which TYPE one of:
 
 `/usr/bin/ipgem-report` runs scripts in `/etc/ipgem-reports/steps`, extracting the
 raw logs into a temporary SQLite database, and (after some work) loading the
-end results into CSV files in `/var/lib/ipgem/reports` (reports that you can
+end results into CSV files in `/srv/ipgem/reports` (reports that you can
 open in Excel).
 
 You can customize this heavily to fit your needs:

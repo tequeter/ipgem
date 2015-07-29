@@ -32,7 +32,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/steps $RPM_BUILD_ROOT/etc/ipgem-repor
 ( cd reports/usr/libexec/ipgem-reports/steps/ && for f in *; do ln -s "/usr/libexec/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
 ( cd reports/usr/share/ipgem-reports/reports/ && for f in *; do ln -s "/usr/share/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
-mkdir -p $RPM_BUILD_ROOT/var/lib/ipgem/reports
+mkdir -p $RPM_BUILD_ROOT/srv/ipgem/reports
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
 
 
@@ -118,7 +118,7 @@ out which clients are still misconfigured.
                                 /usr/bin/ipgem-weekly-stats
                                 /usr/bin/ipgem-report-connection
                                 /usr/bin/ipgem-report
-                                /var/lib/ipgem/reports
+                                /srv/ipgem/reports
 
 
 
