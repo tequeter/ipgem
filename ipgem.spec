@@ -49,6 +49,9 @@ connections to the new IPs.
 %config(noreplace)              /etc/ipgem-gateway/resolver
 %config(noreplace)              /etc/ipgem-gateway/iptables.prefix
 %config(noreplace)              /etc/ipgem-gateway/hosts
+%config(noreplace)              /etc/logrotate.d/ipgem-gateway
+%config(noreplace)              /etc/rsyslog.d/ipgem.conf
+%config(noreplace)              /etc/sysctl.d/ipgem-gateway.conf
                                 /etc/cron.d/ipgem-gateway
                                 /usr/sbin/ipgem-regen-iptables
                                 /usr/sbin/ipgem-ifdown
