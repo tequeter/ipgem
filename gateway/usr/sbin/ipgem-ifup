@@ -4,13 +4,6 @@ set -e -u
 
 . /etc/ipgem-gateway/networking
 
-#cd /etc/sysconfig/network-scripts
-#ls ifcfg-* |grep -vE "-$ADMIN_IFACE|-lo" |while read ifname; do
-#	if grep -qE 'ON(BOOT|PARENT)=yes' "$ifname"; then
-#		ifup "$ifname"
-#	fi
-#done
-
-for iface in "${!IFNAME[@]}"; do
-    ifdown "$iface"
+for iface in "${IFNAME[@]}"; do
+    ifup "$iface"
 done

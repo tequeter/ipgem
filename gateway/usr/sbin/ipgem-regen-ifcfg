@@ -43,6 +43,7 @@ HWADDR=${ifmac[$ifidx]}
 IPADDR=$oldip
 PREFIX=${IFPREFIX[$ifidx]}
 ONBOOT=yes
+NM_CONTROLLED=no
 EOF
 	else
 		# Find a free subinterface
@@ -65,7 +66,8 @@ DEVICE=$subif
 BOOTPROTO=static
 ONPARENT=yes
 IPADDR=$oldip
-NETMASK=255.255.255.0
+PREFIX=${IFPREFIX[$ifidx]}
+NM_CONTROLLED=no
 EOF
 	fi
 done

@@ -7,4 +7,5 @@
 # This line is required (makes the IPGEM rules happen in nat context)
 *nat
 
-#-A PREROUTING -s 3.3.3.3 -j DROP
+# 3.3.3.3 is some spammy server which is not allowed through the gateway
+#-A PREROUTING -s 3.3.3.3 -j RETURN
