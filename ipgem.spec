@@ -28,6 +28,7 @@ cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
 cp -a reports/* $RPM_BUILD_ROOT/
 mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/steps $RPM_BUILD_ROOT/etc/ipgem-reports/reports
+( cd reports/usr/libexec/ipgem-reports/ && for f in extract-*; do ln -s "/usr/libexec/ipgem-reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/; done )
 ( cd reports/usr/libexec/ipgem-reports/steps/ && for f in *; do ln -s "/usr/libexec/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
 ( cd reports/usr/share/ipgem-reports/reports/ && for f in *; do ln -s "/usr/share/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
@@ -63,7 +64,7 @@ connections to the new IPs.
 
 %package reports
 Summary:        Easy Server IPv4 Migration - Reporting component
-Requires:       rsync, sqlite
+Requires:       rsync, sqlite, perl-DBD-SQLite
 
 %description reports
 Install this package to produce CSV activity reports from a Gateway and find
@@ -92,16 +93,20 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/reports/load-destinations.sql
 %config(noreplace)              /etc/ipgem-reports/get-logs
 %config(noreplace)              /etc/ipgem-reports/extract.conf
+%config(noreplace)              /etc/ipgem-reports/extract-linux
+%config(noreplace)              /etc/ipgem-reports/extract-resolver
+%config(noreplace)              /etc/ipgem-reports/extract-srx
+%config(noreplace)              /etc/ipgem-reports/extract-srx-gz
                                 /usr/libexec/ipgem-reports/extract-linux
                                 /usr/libexec/ipgem-reports/extract-resolver
+                                /usr/libexec/ipgem-reports/extract-srx
+                                /usr/libexec/ipgem-reports/extract-srx-gz
+                                /usr/libexec/ipgem-reports/load-report
                                 /usr/libexec/ipgem-reports/steps/10-delete-database
                                 /usr/libexec/ipgem-reports/steps/15-create-database.sql
                                 /usr/libexec/ipgem-reports/steps/20-extract
                                 /usr/libexec/ipgem-reports/steps/40-index-data.sql
                                 /usr/libexec/ipgem-reports/steps/55-classify-connections
-                                /usr/libexec/ipgem-reports/extract-srx
-                                /usr/libexec/ipgem-reports/load-report
-                                /usr/libexec/ipgem-reports/extract-srx-gz
                                 /usr/share/ipgem-reports/reports/load-destinations.columns
                                 /usr/share/ipgem-reports/reports/load-sources.sql
                                 /usr/share/ipgem-reports/reports/load-todo.sql

@@ -19,12 +19,19 @@ use DBI;
 # Date <= 4 w
 # Proto != ICMP
 
+our $LOG_TZ;
+our $WEEKS_OF_LINUX_LOGS;
+our %IGNORE_PROTO;
+our %IGNORE_SRC;
+our %IGNORE_DST;
+
 my $CONF = '/etc/ipgem-reports/extract.conf';
+
 unless ( my $do_ret = do $CONF )
 {
-   warn "couldn't parse $CONF: $@" if $@;
-   warn "couldn't do $CONF: $!"    unless defined $do_ret;
-   warn "couldn't run $CONF"       unless $do_ret;
+    warn "couldn't parse $CONF: $@" if $@;
+    warn "couldn't do $CONF: $!"    unless defined $do_ret;
+    warn "couldn't run $CONF"       unless $do_ret;
 }
 
 my $date_input_ref = DateTime::Format::Strptime->new(
@@ -68,7 +75,7 @@ sub load_data
             chomp;
             if ( my ( $datestr, $host, $desc, $src, $dst, $proto, $dport, $icmp ) = /^
                 (\w{3} \s+ \d{1,2} \s [0-9:]{8}) \s+    # May 23 09:37:12
-                ([A-Z-]+) \s+                           # SRVIPGPAL
+                ([\w-]+) \s+                            # SRVIPGPAL
                 kernel: \s (\S+) \s+                    # oldname-newname
                 IN=\S* \s+ OUT=\S* \s+ MAC=\S* \s+
                 SRC=(\S+) \s+ DST=(\S+) \s+             # SRC=1.1.1.1 DST=2.2.2.2
