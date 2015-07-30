@@ -60,6 +60,7 @@ connections to the new IPs.
                                 /usr/sbin/ipgem-regen-ifcfg
                                 /usr/sbin/ipgem-ifup
                                 /usr/bin/ipgem-resolver
+                                /usr/lib/modules-load.d/ipgem-gateway.conf
 
 
 %package reports

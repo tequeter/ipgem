@@ -229,6 +229,8 @@ You can customize this heavily to fit your needs:
 
 See https://github.com/tequeter/ipgem/issues/ .
 
+Some protocols do not work through NAT, most notably FTPS.
+
 ## Author, Credits, and Licence
 
 Idea and implementation: Thomas Equeter
