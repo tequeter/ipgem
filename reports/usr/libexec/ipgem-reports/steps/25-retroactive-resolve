@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use English qw( -no_match_vars );
+use DBI;
+use DateTime;
+use DateTime::Format::Strptime;
+
+my $SRC_FNAME = 'retroactive-resolve.conf';
+# See retroactive-resolve.conf comments for the file format
+
+my $CONF = '/etc/ipgem-reports/extract.conf';
+our $LOG_TZ;
+unless ( my $do_ret = do $CONF )
+{
+    warn "couldn't parse $CONF: $@" if $@;
+    warn "couldn't do $CONF: $!"    unless defined $do_ret;
+    warn "couldn't run $CONF"       unless $do_ret;
+}
+
+my $date_parser_ref = DateTime::Format::Strptime->new(
+    pattern   => '%F',
+    locale    => 'en_US',
+    time_zone => $LOG_TZ,
+);
+
+my $datetime_parser_ref = DateTime::Format::Strptime->new(
+    pattern   => '%FT%T',
+    locale    => 'en_US',
+    time_zone => $LOG_TZ,
+);
+
+sub parse_timestamp
+{
+    my ( $column, $str ) = @_;
+    my $dt_ref;
+
+    $dt_ref = $datetime_parser_ref->parse_datetime( $str );
+    return $dt_ref->epoch() if $dt_ref;
+
+    $dt_ref = $date_parser_ref->parse_datetime( $str );
+    return $dt_ref->epoch() if $dt_ref;
+
+    my $error = $date_parser_ref->errmsg();
+    die "Can't parse column $column: $error\n";
+}
+
+sub main
+{
+    open my $fh_ref, '<', $SRC_FNAME
+        or die "Can't open $SRC_FNAME: $OS_ERROR\n";
+
+    my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
+        { RaiseError => 1, AutoCommit => 0 } );
+    my $db_insert_ref = $dbh_ref->prepare( 'INSERT INTO dns VALUES(?, ?, ?, ?)' );
+
+    LINE: while ( readline $fh_ref )
+    {
+        chomp;
+
+        next LINE if /^\s* (?: \#.* )? $/xms; # Skip comments and blank lines
+
+        my ( $valid, $until, $ip, $name ) = split /\s+/;
+        if ( !$valid || !$until || !$ip || !$name )
+        {
+            print STDERR "invalid line at $SRC_FNAME:$.: $_\n";
+            next LINE;
+        }
+
+        my $ok = eval {
+            $valid = parse_timestamp( 'Since', $valid );
+            $until = parse_timestamp( 'Until', $until );
+            1;
+        };
+        if ( !$ok )
+        {
+            print STDERR "invalid date at $SRC_FNAME:$.: $EVAL_ERROR\n";
+            next LINE;
+        }
+
+        $db_insert_ref->execute( $valid, $until, $ip, $name );
+    }
+
+    $dbh_ref->commit();
+    1;
+}
+
+main;

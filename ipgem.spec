@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
@@ -54,7 +54,7 @@ connections to the new IPs.
 %config(noreplace)              /etc/logrotate.d/ipgem-gateway
 %config(noreplace)              /etc/rsyslog.d/ipgem.conf
 %config(noreplace)              /etc/sysctl.d/ipgem-gateway.conf
-                                /etc/cron.d/ipgem-gateway
+%config(noreplace)              /etc/cron.d/ipgem-gateway
                                 /usr/sbin/ipgem-regen-iptables
                                 /usr/sbin/ipgem-ifdown
                                 /usr/sbin/ipgem-regen-ifcfg
@@ -73,12 +73,13 @@ out which clients are still misconfigured.
 
 %files reports
 %doc                            /usr/share/doc/ipgem-reports/README.md
-                                /etc/cron.d/ipgem-reports
-                                /etc/ipgem-reports/steps/10-delete-database
-                                /etc/ipgem-reports/steps/15-create-database.sql
-                                /etc/ipgem-reports/steps/20-extract
-                                /etc/ipgem-reports/steps/40-index-data.sql
-                                /etc/ipgem-reports/steps/55-classify-connections
+%config(noreplace)              /etc/cron.d/ipgem-reports
+%config(noreplace)              /etc/ipgem-reports/steps/10-delete-database
+%config(noreplace)              /etc/ipgem-reports/steps/15-create-database.sql
+%config(noreplace)              /etc/ipgem-reports/steps/20-extract
+%config(noreplace)              /etc/ipgem-reports/steps/25-retroactive-resolve
+%config(noreplace)              /etc/ipgem-reports/steps/40-index-data.sql
+%config(noreplace)              /etc/ipgem-reports/steps/55-classify-connections
 %config(noreplace)              /etc/ipgem-reports/steps/80-load-reports
 %config(noreplace)              /etc/ipgem-reports/load.conf
 %config(noreplace)              /etc/ipgem-reports/weekly-stats-todo.sql
@@ -93,6 +94,7 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/reports/load-sources.columns
 %config(noreplace)              /etc/ipgem-reports/reports/load-destinations.sql
 %config(noreplace)              /etc/ipgem-reports/get-logs
+%config(noreplace)              /etc/ipgem-reports/retroactive-resolve.conf
 %config(noreplace)              /etc/ipgem-reports/extract.conf
 %config(noreplace)              /etc/ipgem-reports/extract/linux
 %config(noreplace)              /etc/ipgem-reports/extract/resolver
@@ -106,6 +108,7 @@ out which clients are still misconfigured.
                                 /usr/libexec/ipgem-reports/steps/10-delete-database
                                 /usr/libexec/ipgem-reports/steps/15-create-database.sql
                                 /usr/libexec/ipgem-reports/steps/20-extract
+                                /usr/libexec/ipgem-reports/steps/25-retroactive-resolve
                                 /usr/libexec/ipgem-reports/steps/40-index-data.sql
                                 /usr/libexec/ipgem-reports/steps/55-classify-connections
                                 /usr/share/ipgem-reports/reports/load-destinations.columns
@@ -124,6 +127,9 @@ out which clients are still misconfigured.
 
 
 %changelog
+* Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.1-1
+- Added retroactive-resolve dns source
+- Declared some conffiles as noreplace
 * Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.0-1
 - Version bump, too many changes to list. See Git log.
 * Mon Jul 27 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.1.0-1
