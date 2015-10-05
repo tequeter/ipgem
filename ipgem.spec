@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
@@ -124,5 +124,7 @@ out which clients are still misconfigured.
 
 
 %changelog
-* Mon Jul 27 2015 Thomas Equeter <thomas@equeter.com> 0.1.0-1
+* Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.0-1
+- Version bump, too many changes to list. See Git log.
+* Mon Jul 27 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.1.0-1
 - Initial packaging
