@@ -27,8 +27,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway
 cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
 cp -a reports/* $RPM_BUILD_ROOT/
-mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/steps $RPM_BUILD_ROOT/etc/ipgem-reports/reports
-( cd reports/usr/libexec/ipgem-reports/ && for f in extract-*; do ln -s "/usr/libexec/ipgem-reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/; done )
+mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/{steps,reports,extract}
+( cd reports/usr/libexec/ipgem-reports/extract/ && for f in *; do ln -s "/usr/libexec/ipgem-reports/extract/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/extract/; done )
 ( cd reports/usr/libexec/ipgem-reports/steps/ && for f in *; do ln -s "/usr/libexec/ipgem-reports/steps/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/steps/; done )
 ( cd reports/usr/share/ipgem-reports/reports/ && for f in *; do ln -s "/usr/share/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
@@ -94,14 +94,14 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/reports/load-destinations.sql
 %config(noreplace)              /etc/ipgem-reports/get-logs
 %config(noreplace)              /etc/ipgem-reports/extract.conf
-%config(noreplace)              /etc/ipgem-reports/extract-linux
-%config(noreplace)              /etc/ipgem-reports/extract-resolver
-%config(noreplace)              /etc/ipgem-reports/extract-srx
-%config(noreplace)              /etc/ipgem-reports/extract-srx-gz
-                                /usr/libexec/ipgem-reports/extract-linux
-                                /usr/libexec/ipgem-reports/extract-resolver
-                                /usr/libexec/ipgem-reports/extract-srx
-                                /usr/libexec/ipgem-reports/extract-srx-gz
+%config(noreplace)              /etc/ipgem-reports/extract/linux
+%config(noreplace)              /etc/ipgem-reports/extract/resolver
+%config(noreplace)              /etc/ipgem-reports/extract/srx
+%config(noreplace)              /etc/ipgem-reports/extract/srx-gz
+                                /usr/libexec/ipgem-reports/extract/linux
+                                /usr/libexec/ipgem-reports/extract/resolver
+                                /usr/libexec/ipgem-reports/extract/srx
+                                /usr/libexec/ipgem-reports/extract/srx-gz
                                 /usr/libexec/ipgem-reports/load-report
                                 /usr/libexec/ipgem-reports/steps/10-delete-database
                                 /usr/libexec/ipgem-reports/steps/15-create-database.sql

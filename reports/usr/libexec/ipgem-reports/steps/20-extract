@@ -3,11 +3,11 @@
 set -e -u
 
 # Extract logs from /var/cache/ipgem/logs/TYPE/HOST/logfile.1
-# using extract-TYPE in the current directory (presumably feeding
+# using extract/TYPE in the current directory (presumably feeding
 # it into the work database).
 
 for type in $( ls /var/cache/ipgem/logs/ ); do
-    extractor="./extract-$type"
+    extractor="./extract/$type"
     if [ -x "$extractor" ]; then
         echo "## Extractings $type logs"
         find "/var/cache/ipgem/logs/$type/" -type f \
