@@ -105,10 +105,11 @@ sub load_data
                 my $datesql = $date_ref->epoch();
                 $db_insert_ref->execute( $datesql, $host, $desc, $src, $dst, $proto, $dport );
             }
-            else
+            elsif ( m/\bOUT=/ ) # Some plausible iptables log line
             {
                 print STDERR "Unable to parse line $file:$.\n";
             }
+            # Else: probably some kernel log that we shouldn't concern ourselves with
         }
     }
     $dbh_ref->commit();
