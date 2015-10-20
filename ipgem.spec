@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
@@ -128,6 +128,12 @@ out which clients are still misconfigured.
 
 
 %changelog
+* Tue Oct 20 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.2-1
+- Made ipgem-regen-ifcfg more or less transactional
+- Added ipgem-regen-ifcfg --dry-run
+- Made sure that packets towards the real (new) IP are always routed through
+  the correct interface.
+- Added a "ipgem-apply" script for convenience
 * Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.1-1
 - Added retroactive-resolve dns source
 - Declared some conffiles as noreplace
