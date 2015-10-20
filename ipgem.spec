@@ -59,6 +59,7 @@ connections to the new IPs.
                                 /usr/sbin/ipgem-ifdown
                                 /usr/sbin/ipgem-regen-ifcfg
                                 /usr/sbin/ipgem-ifup
+                                /usr/sbin/ipgem-apply
                                 /usr/bin/ipgem-resolver
                                 /usr/lib/modules-load.d/ipgem-gateway.conf
 

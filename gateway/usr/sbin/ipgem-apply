@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Writing new IP configuration files."
+ipgem-regen-ifcfg || exit $?
+
+echo "Applying this configuration, there will be a slight interruption."
+ipgem-ifdown
+ipgem-ifup || exit $?
+
+echo "Updating the iptables configuration."
+ipgem-regen-iptables |tee /etc/sysconfig/iptables |iptables-restore || exit $?
+
+echo "OK."
