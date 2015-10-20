@@ -88,6 +88,12 @@ NM_CONTROLLED=no
 EOF
 		modified+=("$ifcfg_parent$subif")
 	fi
+
+	# Ensure that the relayed packets are sent through the right interface,
+	# as they are emitted with $oldip as source
+	routecfg="$ifcfg/route-${IFNAME[$ifidx]}"
+	echo "$newip/32 dev ${IFNAME[$ifidx]}" >>"$routecfg.$new"
+	modified+=("$routecfg")
 done < <( grep -v '^#' "$hosts" |grep '[0-9]' )
 
 # Remove duplicates and sort $modified
