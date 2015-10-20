@@ -55,12 +55,12 @@ connections to the new IPs.
 %config(noreplace)              /etc/rsyslog.d/ipgem.conf
 %config(noreplace)              /etc/sysctl.d/ipgem-gateway.conf
 %config(noreplace)              /etc/cron.d/ipgem-gateway
-                                /usr/sbin/ipgem-regen-iptables
-                                /usr/sbin/ipgem-ifdown
-                                /usr/sbin/ipgem-regen-ifcfg
-                                /usr/sbin/ipgem-ifup
-                                /usr/sbin/ipgem-apply
-                                /usr/bin/ipgem-resolver
+%attr(755, -, -)                /usr/sbin/ipgem-regen-iptables
+%attr(755, -, -)                /usr/sbin/ipgem-ifdown
+%attr(755, -, -)                /usr/sbin/ipgem-regen-ifcfg
+%attr(755, -, -)                /usr/sbin/ipgem-ifup
+%attr(755, -, -)                /usr/sbin/ipgem-apply
+%attr(755, -, -)                /usr/bin/ipgem-resolver
                                 /usr/lib/modules-load.d/ipgem-gateway.conf
 
 
@@ -101,17 +101,17 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/extract/resolver
 %config(noreplace)              /etc/ipgem-reports/extract/srx
 %config(noreplace)              /etc/ipgem-reports/extract/srx-gz
-                                /usr/libexec/ipgem-reports/extract/linux
-                                /usr/libexec/ipgem-reports/extract/resolver
-                                /usr/libexec/ipgem-reports/extract/srx
-                                /usr/libexec/ipgem-reports/extract/srx-gz
-                                /usr/libexec/ipgem-reports/load-report
-                                /usr/libexec/ipgem-reports/steps/10-delete-database
+%attr(755, -, -)                /usr/libexec/ipgem-reports/extract/linux
+%attr(755, -, -)                /usr/libexec/ipgem-reports/extract/resolver
+%attr(755, -, -)                /usr/libexec/ipgem-reports/extract/srx
+%attr(755, -, -)                /usr/libexec/ipgem-reports/extract/srx-gz
+%attr(755, -, -)                /usr/libexec/ipgem-reports/load-report
+%attr(755, -, -)                /usr/libexec/ipgem-reports/steps/10-delete-database
                                 /usr/libexec/ipgem-reports/steps/15-create-database.sql
-                                /usr/libexec/ipgem-reports/steps/20-extract
-                                /usr/libexec/ipgem-reports/steps/25-retroactive-resolve
+%attr(755, -, -)                /usr/libexec/ipgem-reports/steps/20-extract
+%attr(755, -, -)                /usr/libexec/ipgem-reports/steps/25-retroactive-resolve
                                 /usr/libexec/ipgem-reports/steps/40-index-data.sql
-                                /usr/libexec/ipgem-reports/steps/55-classify-connections
+%attr(755, -, -)                /usr/libexec/ipgem-reports/steps/55-classify-connections
                                 /usr/share/ipgem-reports/reports/load-destinations.columns
                                 /usr/share/ipgem-reports/reports/load-sources.sql
                                 /usr/share/ipgem-reports/reports/load-todo.sql
@@ -120,9 +120,9 @@ out which clients are still misconfigured.
                                 /usr/share/ipgem-reports/reports/load-connections.sql
                                 /usr/share/ipgem-reports/reports/load-sources.columns
                                 /usr/share/ipgem-reports/reports/load-destinations.sql
-                                /usr/bin/ipgem-weekly-stats
-                                /usr/bin/ipgem-report-connection
-                                /usr/bin/ipgem-report
+%attr(755, -, -)                /usr/bin/ipgem-weekly-stats
+%attr(755, -, -)                /usr/bin/ipgem-report-connection
+%attr(755, -, -)                /usr/bin/ipgem-report
                                 /srv/ipgem/reports
 
 
