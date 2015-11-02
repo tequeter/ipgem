@@ -6,13 +6,16 @@ set -e -u
 # using extract/TYPE in the current directory (presumably feeding
 # it into the work database).
 
+# NB: not using xarg's parallel mode (-P) as it causes a writer starvatiuon on
+# huge logfiles, and it is hard to fix with SQLite.
+
 for type in $( ls /var/cache/ipgem/logs/ ); do
     extractor="./extract/$type"
     if [ -x "$extractor" ]; then
         echo "## Extractings $type logs"
         find "/var/cache/ipgem/logs/$type/" -type f \
             |sort \
-            |xargs -n 1 -P 3 -t "$extractor"
+            |xargs -n 1 -t "$extractor"
     else
         echo "Don't know how to extract data from logs of type $type"
         exit 1

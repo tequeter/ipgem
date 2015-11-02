@@ -1,3 +1,3 @@
 #!/bin/sh
 
-rm -f /var/cache/ipgem/tmp.db
+rm -f /var/cache/ipgem/tmp.db*
