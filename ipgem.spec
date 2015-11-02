@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.2.2
+Version:        0.2.3
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
@@ -130,6 +130,11 @@ out which clients are still misconfigured.
 
 
 %changelog
+* Mon Nov 02 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.3-1
+- Fixed "database is locked" failure when ipgem-report processes huge logfiles.
+- Made cron jobs only send mail when they require attention
+- Fixed the resolver not processing all gateway logs, leaving unresolved
+  entries in the reports.
 * Tue Oct 20 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.2-1
 - Made ipgem-regen-ifcfg more or less transactional
 - Added ipgem-regen-ifcfg --dry-run
