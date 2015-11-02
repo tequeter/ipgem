@@ -8,7 +8,7 @@ FROM (
     UNION ALL
     SELECT MAX(date) AS last_occ, COUNT(*) AS count_occ, host, NULL, '', '', desc, dst, proto, dport, typology
         FROM resolved_log
-        WHERE typology IN( 'Parc', 'Mag', 'Entrepot' )
+        WHERE typology NOT IN( 'Autre', 'SrvSrv' )
             AND date >= ? AND date < ?
         GROUP BY host, desc, dst, proto, dport, typology
 )
