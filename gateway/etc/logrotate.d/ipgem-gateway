@@ -5,6 +5,8 @@
 	/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
     endscript
     nocompress
+    # The resolver is looking for i-p.1 as the previous log
+    nodateext
 }
 
 /var/log/ipgem-resolver
