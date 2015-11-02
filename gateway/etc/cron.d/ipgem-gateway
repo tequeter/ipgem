@@ -1,1 +1,1 @@
-0 * * * * root /usr/bin/ipgem-resolver 1 /var/log/ipgem-gateway /var/log/ipgem-gateway.1 >>/var/log/ipgem-resolver
+0 * * * * root /usr/bin/chronic /bin/sh -c '/usr/bin/ipgem-resolver 1 /var/log/ipgem-gateway /var/log/ipgem-gateway.1 >>/var/log/ipgem-resolver'

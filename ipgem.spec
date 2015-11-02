@@ -39,6 +39,8 @@ cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
 %package gateway
 Summary:        Easy Server IPv4 Migration - Gateway component
 %{?el7:Requires: iptables-services}
+# chronic
+Requires:       moreutils
 
 %description gateway
 Install this package to impersonate the servers on their old IPs and relay the
