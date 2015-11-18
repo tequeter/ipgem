@@ -65,6 +65,7 @@ IPADDR=$oldip
 PREFIX=${IFPREFIX[$ifidx]}
 ONBOOT=yes
 NM_CONTROLLED=no
+ARPCHECK=no
 EOF
 		modified+=("$ifcfg_parent")
 	else
@@ -90,6 +91,7 @@ ONPARENT=yes
 IPADDR=$oldip
 PREFIX=${IFPREFIX[$ifidx]}
 NM_CONTROLLED=no
+ARPCHECK=no
 EOF
 		modified+=("$ifcfg_parent$subif")
 	fi
