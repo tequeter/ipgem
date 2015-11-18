@@ -2,13 +2,16 @@
 
 # This is a bash shell fragment containing configuration for ipgem scripts
 
+# IMPORTANT: these settings are critical to the proper operation of the
+# gateway. Please replace the examples below with appropriate values.
+
 # Which interface has the administrative IP
-#ADMIN_IFACE=eth0
+IFNAME_MGMT='eth0'
 
 # Declare which interfaces to use as IP gateways
-# Do NOT include the administrative interface here
-declare -a IFNAME=( 'eth1' )
+# It may include the management interface
+declare -a IFNAME=( 'eth0' 'eth1' )
 # For each IFNAME, add here the network prefix (length, in bits)
-declare -a IFPREFIX=( '24' )
+declare -a IFPREFIX=( 23 24 )
 # For each IFNAME, add here a regexp matching IPs to impersonate in /etc/ipgem-gateway/hosts
-declare -a IFNET_RE=( '^192\.168\.20\.' )
+declare -a IFNET_RE=( '^10\.1\.[01]\.' '^192\.168\.20\.' )
