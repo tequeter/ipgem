@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e -u
+shopt -s nullglob
+shopt -u failglob
 
 . /etc/ipgem-gateway/networking
 
