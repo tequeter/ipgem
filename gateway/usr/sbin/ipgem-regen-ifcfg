@@ -135,5 +135,7 @@ fi
 rm -f "${existing_cfg[@]}"
 # Replace the config files with the $new ones
 for f in "${modified[@]}"; do
-	mv -f "$f.$new" "$f"
+	if [ -e "$f.$new" ]; then
+		mv -f "$f.$new" "$f"
+	fi
 done
