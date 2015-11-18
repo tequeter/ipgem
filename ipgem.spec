@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.2.3
+Version:        0.2.4
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
@@ -130,6 +130,12 @@ out which clients are still misconfigured.
 
 
 %changelog
+* Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
+- Reporting improvements.
+- Support relaying on the management interface.
+- Fixed dry-run for interfaces currently without subinterfaces.
+- Fixed removing hosts (bug introduced in v0.2.2)
+- Disabled the slow duplicate IPs check
 * Mon Nov 02 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.3-1
 - Fixed "database is locked" failure when ipgem-report processes huge logfiles.
 - Made cron jobs only send mail when they require attention
