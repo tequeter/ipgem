@@ -8,6 +8,6 @@ ipgem-ifdown
 ipgem-ifup || exit $?
 
 echo "Updating the iptables configuration."
-ipgem-regen-iptables |tee /etc/sysconfig/iptables |iptables-restore || exit $?
+ipgem-regen-iptables || exit $?
 
 echo "OK."

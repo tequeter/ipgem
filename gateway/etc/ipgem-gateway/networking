@@ -6,6 +6,7 @@
 # gateway. Please replace the examples below with appropriate values.
 
 # Which interface has the administrative IP
+# NB: we assume that it bears the default route, too
 IFNAME_MGMT='eth0'
 
 # Declare which interfaces to use as IP gateways
@@ -15,3 +16,10 @@ declare -a IFNAME=( 'eth0' 'eth1' )
 declare -a IFPREFIX=( 23 24 )
 # For each IFNAME, add here a regexp matching IPs to impersonate in /etc/ipgem-gateway/hosts
 declare -a IFNET_RE=( '^10\.1\.[01]\.' '^192\.168\.20\.' )
+
+# Advanced routing configuration. You probably don't need to touch anything here,
+# unless it conflicts with other configuration on this server. But it is dedicated
+# to IPGEM, right?
+TABLE_VIA_MGMT_NUM=144
+TABLE_VIA_MGMT_NAME=ipgem_via_mgmt
+MARK_VIA_MGMT=0x9ED5C462

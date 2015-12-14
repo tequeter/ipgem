@@ -142,6 +142,9 @@ just pull the plug on IPGEM rather than trying to fix the last things.
 
 Go through `/etc/ipgem-gateway/networking` and follow the instructions in the comments.
 
+Make sure that your management interface has `NM_CONTROLLED=no` in its `ifcfg`
+file and that it bears the default route.
+
 There is a resolver that performs periodic reverse name resolution for the
 client IPs that go through the IPGEM gateway (this is useful for dynamic IPs,
 ie. PCs on DHCP). If you need to bypass the DNS for some IPs, edit the Perl
@@ -152,11 +155,9 @@ code in `/etc/ipgem-gateway/resolver`.
 Edit `/etc/ipgem-gateway/hosts` to match which IPs the gateway will impersonate. Then,
 run this to apply the configuration:
 
-    ipgem-regen-ifcfg
-    ipgem-ifdown ; ipgem-ifup
-    ipgem-regen-iptables |tee /etc/sysconfig/iptables |iptables-restore
+    ipgem-apply
 
-NB: there will be a slight service interruption during the ifdown/ifup step.
+NB: there will be a slight service interruption.
 
 If you are impersonating an IP for the first time on IPGEM, you'll need to
 remove it from the ARP cache of your router for a fast transition. For
@@ -164,10 +165,7 @@ instance, on Cisco it's `clear ip arp X.X.X.X`. It would also be possible to
 send some gratuitous ARPs instead, but I did not test it.
 
 You may want to stop relaying hosts or specific services at some point. Edit
-`/etc/ipgem-gateway/iptables.prefix` accordingly, check the results with
-`ipgem-regen-iptables`, then apply them with:
-
-    ipgem-regen-iptables |tee /etc/sysconfig/iptables |iptables-restore
+`/etc/ipgem-gateway/iptables.prefix` and apply it with `ipgem-regen-iptables`.
 
 ## Reporting (Analyzing the Logs)
 

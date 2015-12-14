@@ -47,23 +47,23 @@ Install this package to impersonate the servers on their old IPs and relay the
 connections to the new IPs.
 
 %files gateway
-%doc                            /usr/share/doc/ipgem-gateway/README.md
-%config(noreplace)              /etc/ipgem-gateway/iptables.suffix
-%config(noreplace)              /etc/ipgem-gateway/networking
-%config(noreplace)              /etc/ipgem-gateway/resolver
-%config(noreplace)              /etc/ipgem-gateway/iptables.prefix
-%config(noreplace)              /etc/ipgem-gateway/hosts
-%config(noreplace)              /etc/logrotate.d/ipgem-gateway
-%config(noreplace)              /etc/rsyslog.d/ipgem.conf
-%config(noreplace)              /etc/sysctl.d/ipgem-gateway.conf
-%config(noreplace)              /etc/cron.d/ipgem-gateway
-%attr(755, -, -)                /usr/sbin/ipgem-regen-iptables
-%attr(755, -, -)                /usr/sbin/ipgem-ifdown
-%attr(755, -, -)                /usr/sbin/ipgem-regen-ifcfg
-%attr(755, -, -)                /usr/sbin/ipgem-ifup
-%attr(755, -, -)                /usr/sbin/ipgem-apply
-%attr(755, -, -)                /usr/bin/ipgem-resolver
-                                /usr/lib/modules-load.d/ipgem-gateway.conf
+%doc                                /usr/share/doc/ipgem-gateway/README.md
+%attr(755, -, -) %config(noreplace) /etc/ipgem-gateway/iptables.suffix
+%attr(755, -, -) %config(noreplace) /etc/ipgem-gateway/iptables.prefix
+%config(noreplace)                  /etc/ipgem-gateway/networking
+%config(noreplace)                  /etc/ipgem-gateway/resolver
+%config(noreplace)                  /etc/ipgem-gateway/hosts
+%config(noreplace)                  /etc/logrotate.d/ipgem-gateway
+%config(noreplace)                  /etc/rsyslog.d/ipgem.conf
+%config(noreplace)                  /etc/sysctl.d/ipgem-gateway.conf
+%config(noreplace)                  /etc/cron.d/ipgem-gateway
+%attr(755, -, -)                    /usr/sbin/ipgem-regen-iptables
+%attr(755, -, -)                    /usr/sbin/ipgem-ifdown
+%attr(755, -, -)                    /usr/sbin/ipgem-regen-ifcfg
+%attr(755, -, -)                    /usr/sbin/ipgem-ifup
+%attr(755, -, -)                    /usr/sbin/ipgem-apply
+%attr(755, -, -)                    /usr/bin/ipgem-resolver
+                                    /usr/lib/modules-load.d/ipgem-gateway.conf
 
 
 %package reports
@@ -130,6 +130,10 @@ out which clients are still misconfigured.
 
 
 %changelog
+* Mon Dec 14 2015 Thomas Equeter <tequeter@users.noreply.github.com> 1.0.0-1
+- Force all the relayed trafic to go through the management interface.
+- Some incompatible configuration changes to support that (in networking and
+  iptables.*).
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
 - Reporting improvements.
 - Support relaying on the management interface.

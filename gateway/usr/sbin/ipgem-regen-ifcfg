@@ -95,13 +95,33 @@ ARPCHECK=no
 EOF
 		modified+=("$ifcfg_parent$subif")
 	fi
-
-	# Ensure that the relayed packets are sent through the right interface,
-	# as they are emitted with $oldip as source
-	routecfg="$ifcfg/route-${IFNAME[$ifidx]}"
-	echo "$newip/32 dev ${IFNAME[$ifidx]}" >>"$routecfg.$new"
-	modified+=("$routecfg")
 done < <( grep -v '^#' "$hosts" |grep '[0-9]' )
+
+# Declare a routing table that forces output through the management interface
+# Create the table
+modified+=("/etc/iproute2/rt_tables")
+sed -e '/ipgem/d' "/etc/iproute2/rt_tables" >"/etc/iproute2/rt_tables.$new"
+echo "$TABLE_VIA_MGMT_NUM $TABLE_VIA_MGMT_NAME" >>"/etc/iproute2/rt_tables.$new"
+# Copy the routes relevant to this interface (default route, local subnet) to our custom table
+default_gw="$( ip -4 route show to 0/0 dev $IFNAME_MGMT |head -n 1 |awk '{ print $3 }' )"
+if [ -z "$default_gw" ]; then
+	echo "The management interface $IFNAME_MGMT does not have the default route, check your configuration" >&2
+	exit 1
+fi
+modified+=("$ifcfg/route-$IFNAME_MGMT")
+test -e "$ifcfg/route-$IFNAME_MGMT" && cp "$ifcfg/route-$IFNAME_MGMT" "$ifcfg/route-$IFNAME_MGMT.$new"
+touch "$ifcfg/route-$IFNAME_MGMT.$new"
+sed -i -e '/ipgem/,$d' "$ifcfg/route-$IFNAME_MGMT.$new"
+echo "# ipgem starts here - do not modify below this line" >>"$ifcfg/route-$IFNAME_MGMT.$new"
+ip -4 route show dev "$IFNAME_MGMT" \
+	| sed -e 's/proto \+kernel//g' -e "s/^/table $TABLE_VIA_MGMT_NAME dev $IFNAME_MGMT /" \
+	>>"$ifcfg/route-$IFNAME_MGMT.$new"
+# Create a routing rule that uses the custom table for packets marked by iptables
+modified+=("$ifcfg/rule-$IFNAME_MGMT")
+test -e "$ifcfg/rule-$IFNAME_MGMT" && cp "$ifcfg/rule-$IFNAME_MGMT" "$ifcfg/rule-$IFNAME_MGMT.$new"
+touch "$ifcfg/rule-$IFNAME_MGMT.$new"
+sed -i -e "/$MARK_VIA_MGMT/d" "$ifcfg/rule-$IFNAME_MGMT.$new"
+echo "fwmark $MARK_VIA_MGMT table $TABLE_VIA_MGMT_NUM" >>"$ifcfg/rule-$IFNAME_MGMT.$new"
 
 # Remove duplicates and sort $modified
 readarray -t modified < <( printf "%s\n" "${modified[@]}" | sort -u )

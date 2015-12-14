@@ -1,13 +1,3 @@
-# This is an iptables-save(1) fragment.
-#
-# The contents of this file will be interpreted after the IPGEM rules.
-# It's typically used to discard traffic from specific sources without
-# polluting the logs.
+#!/bin/bash
 
-# This line is required (commits the IPGEM rules)
-COMMIT
-
-# Add filter rules here if you wish (they'll show up in the IPGEM logs)
-*filter
-
-COMMIT
+# This script will be executed after adding the IPGEM rules.

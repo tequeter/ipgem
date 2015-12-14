@@ -1,11 +1,10 @@
-# This is an iptables-save(1) fragment.
-#
-# The contents of this file will be interpreted before the IPGEM rules.
+#!/bin/bash
+
+# This script will be executed after flushing netfilter but before adding the
+# IPGEM rules.
+
 # It's typically used to discard traffic from specific sources without
 # polluting the logs.
 
-# This line is required (makes the IPGEM rules happen in nat context)
-*nat
-
-# 3.3.3.3 is some spammy server which is not allowed through the gateway
-#-A PREROUTING -s 3.3.3.3 -j RETURN
+# Example: 3.3.3.3 is some spammy server which is not allowed through the gateway
+#iptables -t nat -A PREROUTING -s 3.3.3.3 -j RETURN

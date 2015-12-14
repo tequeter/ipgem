@@ -1,30 +1,37 @@
 #!/bin/bash
 
+set -e -u
+
+. /etc/ipgem-gateway/networking
+
 prefix=/etc/ipgem-gateway/iptables.prefix
 suffix=/etc/ipgem-gateway/iptables.suffix
 hosts=/etc/ipgem-gateway/hosts
 
-echo "# BEGIN $prefix"
-echo
-cat "$prefix"
-echo "# END $prefix"
-echo
-echo
-echo "# BEGIN Ipgroup rules generated from $hosts at $( date '+%F %T')"
-echo
-grep -v '^#' "$hosts" |grep '[0-9]' |while read name oldip newip; do
-	shortname="$( echo $name |tr -d '"' |cut -b1-28 )"
-	echo "# $oldip -> $newip ($name)"
-	echo "-A PREROUTING -d $oldip -j LOG --log-level debug --log-prefix \"$shortname \""
-	echo "-A PREROUTING -d $oldip -j DNAT --to-destination $newip"
-	echo "-A POSTROUTING -d $newip -j SNAT --to-source $oldip"
+mgmtip="$( ip -4 addr sh dev "$IFNAME_MGMT" primary |grep inet |awk '{ print $2 }' |cut -d/ -f1 )"
+if [ -z "$mgmtip" ]; then
+       echo "Error: cannot determine the primary IP of the management interface $IFNAME_MGMT" >&2
+       exit 1
+fi
+
+for table in filter nat mangle; do
+	iptables -t "$table" -F
 done
-echo
-echo "# END Ipgroup rules"
-echo
-echo
-echo "# BEGIN $prefix"
-echo
-cat "$suffix"
-echo
-echo "# END $suffix"
+
+"$prefix"
+
+grep -v '^#' "$hosts" |grep '[0-9]' |while read name oldip newip; do
+	shortname="$( echo $name |tr -dc '[:alnum:]_-' |cut -b1-28 )"
+	comment="-m comment --comment $shortname"
+	#echo "# $shortname: client -> $oldip ==NAT==> $mgmtip -> $newip"
+	# Produce logs used for reporting
+	iptables -t nat -A PREROUTING -d "$oldip" -m conntrack --ctstate NEW,RELATED -j LOG --log-level debug --log-prefix "$shortname "
+	# Basic oldip > newip translation
+	iptables -t nat -A PREROUTING -d "$oldip" $comment -m conntrack --ctstate NEW,RELATED -j DNAT --to-destination "$newip"
+	# Use the management IP as source on all the relayed connections
+	iptables -t nat -A POSTROUTING -d "$newip" $comment -m conntrack --ctstate NEW,RELATED -j SNAT --to-source "$mgmtip"
+	# ... and force the outgoing packets to leave through that interface
+	iptables -t mangle -A PREROUTING -d "$oldip" $comment -m conntrack --ctdir ORIGINAL -j MARK --set-mark "$MARK_VIA_MGMT"
+done
+
+"$suffix"
