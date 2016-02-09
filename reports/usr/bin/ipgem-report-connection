@@ -17,7 +17,7 @@ unless ( my $do_ret = do $CONF )
 }
 
 my $query = <<'EOF';
-SELECT date, host, src, srcname, desc, dst, proto, dport, typology
+SELECT date, host, src, srcname, desc, dst, proto, dport, tclass
     FROM resolved_log
     WHERE src=? AND dst=?
 EOF

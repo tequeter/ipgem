@@ -135,6 +135,8 @@ out which clients are still misconfigured.
 - Some incompatible configuration changes to support that (in networking and
   iptables.*).
 - Improve the reporting performance through database optimizations.
+- Rename the "typology" column in resolved_log to "tclass" (traffic class).
+  This is backward incompatible if you had custom reports.
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
 - Reporting improvements.
 - Support relaying on the management interface.
