@@ -18,8 +18,8 @@ sub main
 {
     my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
         { RaiseError => 1, AutoCommit => 0 } );
-    my $select_ref = $dbh_ref->prepare( 'SELECT log_id, host, src, srcname, dst, desc FROM resolved_log' );
-    my $update_ref = $dbh_ref->prepare( 'UPDATE log SET typology=? WHERE rowid = ?' );
+    my $select_ref = $dbh_ref->prepare( 'SELECT rowid, host, src, srcname, dst, desc FROM resolved_log' );
+    my $update_ref = $dbh_ref->prepare( 'UPDATE resolved_log SET typology=? WHERE rowid = ?' );
 
     # This kind of whole-table loop would be horribly inefficient, but SQLite
     # is really too limited to implement this filter easily DB-side.
