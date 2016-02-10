@@ -81,8 +81,10 @@ out which clients are still misconfigured.
 %config(noreplace)              /etc/ipgem-reports/steps/15-create-database.sql
 %config(noreplace)              /etc/ipgem-reports/steps/20-extract
 %config(noreplace)              /etc/ipgem-reports/steps/25-retroactive-resolve
-%config(noreplace)              /etc/ipgem-reports/steps/40-index-data.sql
+%config(noreplace)              /etc/ipgem-reports/steps/40-index-dns.sql
+%config(noreplace)              /etc/ipgem-reports/steps/45-resolve-log.sql
 %config(noreplace)              /etc/ipgem-reports/steps/55-classify-connections
+%config(noreplace)              /etc/ipgem-reports/steps/60-index-tclass.sql
 %config(noreplace)              /etc/ipgem-reports/steps/80-load-reports
 %config(noreplace)              /etc/ipgem-reports/load.conf
 %config(noreplace)              /etc/ipgem-reports/weekly-stats-todo.sql
@@ -112,8 +114,10 @@ out which clients are still misconfigured.
                                 /usr/libexec/ipgem-reports/steps/15-create-database.sql
 %attr(755, -, -)                /usr/libexec/ipgem-reports/steps/20-extract
 %attr(755, -, -)                /usr/libexec/ipgem-reports/steps/25-retroactive-resolve
-                                /usr/libexec/ipgem-reports/steps/40-index-data.sql
+                                /usr/libexec/ipgem-reports/steps/40-index-dns.sql
+                                /usr/libexec/ipgem-reports/steps/45-resolve-log.sql
 %attr(755, -, -)                /usr/libexec/ipgem-reports/steps/55-classify-connections
+                                /usr/libexec/ipgem-reports/steps/60-index-tclass.sql
                                 /usr/share/ipgem-reports/reports/load-destinations.columns
                                 /usr/share/ipgem-reports/reports/load-sources.sql
                                 /usr/share/ipgem-reports/reports/load-todo.sql
@@ -138,6 +142,8 @@ out which clients are still misconfigured.
 - Rename the "typology" column in resolved_log to "tclass" (traffic class).
   This is backward incompatible if you had custom reports.
 - Show a timestamp when executing reporting steps, for profiling.
+- Reorder the indexing steps (backward incompatible if you had customized the
+  database indexing).
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
 - Reporting improvements.
 - Support relaying on the management interface.
