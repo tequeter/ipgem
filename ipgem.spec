@@ -137,6 +137,7 @@ out which clients are still misconfigured.
 - Improve the reporting performance through database optimizations.
 - Rename the "typology" column in resolved_log to "tclass" (traffic class).
   This is backward incompatible if you had custom reports.
+- Show a timestamp when executing reporting steps, for profiling.
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
 - Reporting improvements.
 - Support relaying on the management interface.

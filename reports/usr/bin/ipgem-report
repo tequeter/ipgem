@@ -2,18 +2,24 @@
 
 set -e -u
 
+function xdate () {
+    date --rfc-3339=seconds
+}
+
 cd /etc/ipgem-reports
 for script in steps/[0-9][0-9]-*; do
     if [ -x "$script" ]; then
-        echo "# Executing $script"
+        echo "# $(xdate): Executing $script"
         "$script"
     elif echo "$script" |grep -q '\.sql$'; then
-        echo "# Interpreting SQL script $script"
+        echo "# $(xdate): Interpreting SQL script $script"
         sqlite3 /var/cache/ipgem/tmp.db <"$script"
     else
-        echo "# Don't know what to do with $script" >&2
+        echo "# $(xdate): Don't know what to do with $script" >&2
         exit 1
     fi
 done
+
+echo "# $(xdate): Done."
 
 exit 0
