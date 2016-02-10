@@ -1,5 +1,5 @@
 Name:           ipgem
-Version:        0.2.4
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        Easy Server IPv4 Migration
 BuildArch:      noarch
