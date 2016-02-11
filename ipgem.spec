@@ -144,6 +144,8 @@ out which clients are still misconfigured.
 - Show a timestamp when executing reporting steps, for profiling.
 - Reorder the indexing steps (backward incompatible if you had customized the
   database indexing).
+- Ensure that old resolver logs are purged from the cache. This saves
+  processing time and disk space.
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
 - Reporting improvements.
 - Support relaying on the management interface.
