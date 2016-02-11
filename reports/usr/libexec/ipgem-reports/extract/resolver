@@ -28,7 +28,7 @@ sub main
 {
     my $dbh_ref = DBI->connect( "dbi:SQLite:dbname=/var/cache/ipgem/tmp.db", "", "",
         { RaiseError => 1, AutoCommit => 0 } );
-    my $db_insert_ref = $dbh_ref->prepare( 'INSERT INTO dns VALUES(?, ?, ?, ?)' );
+    my $db_insert_ref = $dbh_ref->prepare( q{INSERT INTO dns VALUES(?, ?, ?, ?, 'D')} );
 
     my $current = 0; # Current $valid value
     my %entries; # $ip => $name

@@ -52,7 +52,12 @@ sub main
 
     my %cache;
     my $date_end_ref = DateTime->now();
-    my $date_start_ref = $date_end_ref - DateTime::Duration->new( hours => $valid_hours );
+    # We cover more than the exact time requested, because we might not start
+    # at the exact same second every $valid_hours. steps/45-resolve-log.sql
+    # will take care of removing the duplicates anyway.
+    my $date_start_ref = $date_end_ref
+        - DateTime::Duration->new( hours => $valid_hours )
+        - DateTime::Duration->new( seconds => 10 );
 
     FILE: foreach my $file ( @ARGV )
     {
@@ -125,6 +130,14 @@ sub main
         {
             delete $cache{$ip};
         }
+    }
+
+    if ( !keys %cache )
+    {
+        # Guarantee that we output at least one line at each run:
+        # the reporting engine needs to identify the latest log entry that has
+        # been processed by the resolver.
+        $cache{'-'} = '-';
     }
 
     while ( my ( $ip, $name ) = each %cache )
