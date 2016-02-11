@@ -39,8 +39,9 @@ sub main
         LINE: while ( readline $fh_ref )
         {
             chomp;
+            next LINE if ( /^#/ );
             my ( $valid, $until, $ip, $name ) = split /\t/;
-            if ( !$valid || !$until || !$ip || !$name )
+            if ( !$valid || !$until || !$ip || !$name || $valid !~ /^\d+$/ || $until !~ /^\d+$/ )
             {
                 print STDERR "invalid line at $file:$.: $_\n";
                 next LINE;
