@@ -24,7 +24,7 @@ mkdir -p $RPM_BUILD_ROOT
 # gateway
 cp -a gateway/* $RPM_BUILD_ROOT/
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway
-cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
+cp *.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
 cp -a reports/* $RPM_BUILD_ROOT/
 mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/{steps,reports,extract}
@@ -33,7 +33,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/ipgem-reports/{steps,reports,extract}
 ( cd reports/usr/share/ipgem-reports/reports/ && for f in *; do ln -s "/usr/share/ipgem-reports/reports/$f" $RPM_BUILD_ROOT/etc/ipgem-reports/reports/; done )
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports
 mkdir -p $RPM_BUILD_ROOT/srv/ipgem/reports
-cp README.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
+cp *.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-reports/
 
 
 %package gateway
@@ -48,6 +48,7 @@ connections to the new IPs.
 
 %files gateway
 %doc                                /usr/share/doc/ipgem-gateway/README.md
+%doc                                /usr/share/doc/ipgem-gateway/ChangeLog.md
 %attr(755, -, -) %config(noreplace) /etc/ipgem-gateway/iptables.suffix
 %attr(755, -, -) %config(noreplace) /etc/ipgem-gateway/iptables.prefix
 %config(noreplace)                  /etc/ipgem-gateway/networking
@@ -76,6 +77,7 @@ out which clients are still misconfigured.
 
 %files reports
 %doc                            /usr/share/doc/ipgem-reports/README.md
+%doc                            /usr/share/doc/ipgem-reports/ChangeLog.md
 %config(noreplace)              /etc/cron.d/ipgem-reports
 %config(noreplace)              /etc/ipgem-reports/steps/10-delete-database
 %config(noreplace)              /etc/ipgem-reports/steps/15-create-database.sql
@@ -134,39 +136,11 @@ out which clients are still misconfigured.
 
 
 %changelog
-* Mon Dec 14 2015 Thomas Equeter <tequeter@users.noreply.github.com> 1.0.0-1
-- Force all the relayed trafic to go through the management interface.
-- Some incompatible configuration changes to support that (in networking and
-  iptables.*).
-- Improve the reporting performance through database optimizations.
-- Rename the "typology" column in resolved_log to "tclass" (traffic class).
-  This is backward incompatible if you had custom reports.
-- Show a timestamp when executing reporting steps, for profiling.
-- Reorder the indexing steps (backward incompatible if you had customized the
-  database indexing).
-- Ensure that old resolver logs are purged from the cache. This saves
-  processing time and disk space.
+* Wed Feb 11 2016 Thomas Equeter <tequeter@users.noreply.github.com> 1.0.0-1
 * Wed Nov 18 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.4-1
-- Reporting improvements.
-- Support relaying on the management interface.
-- Fixed dry-run for interfaces currently without subinterfaces.
-- Fixed removing hosts (bug introduced in v0.2.2)
-- Disabled the slow duplicate IPs check
 * Mon Nov 02 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.3-1
-- Fixed "database is locked" failure when ipgem-report processes huge logfiles.
-- Made cron jobs only send mail when they require attention
-- Fixed the resolver not processing all gateway logs, leaving unresolved
-  entries in the reports.
 * Tue Oct 20 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.2-1
-- Made ipgem-regen-ifcfg more or less transactional
-- Added ipgem-regen-ifcfg --dry-run
-- Made sure that packets towards the real (new) IP are always routed through
-  the correct interface.
-- Added a "ipgem-apply" script for convenience
 * Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.1-1
-- Added retroactive-resolve dns source
-- Declared some conffiles as noreplace
 * Mon Oct 05 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.2.0-1
-- Version bump, too many changes to list. See Git log.
 * Mon Jul 27 2015 Thomas Equeter <tequeter@users.noreply.github.com> 0.1.0-1
 - Initial packaging
