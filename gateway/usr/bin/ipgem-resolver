@@ -137,7 +137,7 @@ sub main
         # Guarantee that we output at least one line at each run:
         # the reporting engine needs to identify the latest log entry that has
         # been processed by the resolver.
-        $cache{-} = '-';
+        $cache{'-'} = '-';
     }
 
     while ( my ( $ip, $name ) = each %cache )
