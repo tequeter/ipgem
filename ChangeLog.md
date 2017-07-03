@@ -1,4 +1,4 @@
-# 1.0.0, unreleased
+# 1.0.0, 2016-02-12
 
 - Force all the relayed trafic to go through the management interface.
 - Some incompatible configuration changes to support that (in networking and
