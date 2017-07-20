@@ -2,9 +2,9 @@
 
 - Force all the relayed trafic to go through the management interface.
 - Some incompatible configuration changes to support that (in networking and
-  iptables.*).
+  `iptables.*`).
 - Improve the reporting performance through database optimizations.
-- Rename the "typology" column in resolved_log to "tclass" (traffic class).
+- Rename the "typology" column in `resolved_log` to "tclass" (traffic class).
   This is backward incompatible if you had custom reports.
 - Show a timestamp when executing reporting steps, for profiling.
 - Reorder the indexing steps (backward incompatible if you had customized the
