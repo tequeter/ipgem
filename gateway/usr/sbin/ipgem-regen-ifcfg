@@ -10,7 +10,7 @@ myname="$( basename "$0" )"
 hosts=/etc/ipgem-gateway/hosts
 declare -a ifmac=()        # MAC addresses of all IP gateway interfaces
 declare -a modified=()     # Modified config files for dry_run
-declare -a previous_cfg=() # Existing config files (will be deleted/replaced)
+declare -a existing_cfg=() # Existing config files (will be deleted/replaced)
 ifcfg=/etc/sysconfig/network-scripts
 new=ipgnew
 dry_run=false
@@ -25,7 +25,7 @@ esac
 # Cleanup if this script failed earlier
 rm -f "$ifcfg"/*."$new"
 
-# Fill in ifmac[] and previous_cfg[]
+# Fill in ifmac[] and existing_cfg[]
 for i in "${!IFNAME[@]}"; do
 	eth="${IFNAME[$i]}"
 	ifmac[$i]="$( ip addr show dev $eth |grep ether |awk '{print $2}' )"
@@ -34,7 +34,9 @@ for i in "${!IFNAME[@]}"; do
 	fi
 	existing_cfg+=("$ifcfg/ifcfg-$eth:"*)
 done
-modified+=("${existing_cfg[@]}")
+if [ ${#existing_cfg[@]} -gt 0 ]; then
+	modified+=("${existing_cfg[@]}")
+fi
 
 # For each configured host (in $hosts) to relay
 while read name oldip newip; do
@@ -152,7 +154,10 @@ if $dry_run; then
 fi
 
 # Cleanup old config files (which may not exist in $modified)
-rm -f "${existing_cfg[@]}"
+if [ ${#existing_cfg[@]} -gt 0 ]; then
+	rm -f "${existing_cfg[@]}"
+fi
+
 # Replace the config files with the $new ones
 for f in "${modified[@]}"; do
 	if [ -e "$f.$new" ]; then
