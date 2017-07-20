@@ -23,6 +23,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 # gateway
 cp -a gateway/* $RPM_BUILD_ROOT/
+mkdir -p $RPM_BUILD_ROOT/var/cache/ipgem
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway
 cp *.md $RPM_BUILD_ROOT/usr/share/doc/ipgem-gateway/
 # reporting
@@ -131,6 +132,7 @@ out which clients are still misconfigured.
 %attr(755, -, -)                /usr/bin/ipgem-weekly-stats
 %attr(755, -, -)                /usr/bin/ipgem-report-connection
 %attr(755, -, -)                /usr/bin/ipgem-report
+                                /var/cache/ipgem
                                 /srv/ipgem/reports
 
 
