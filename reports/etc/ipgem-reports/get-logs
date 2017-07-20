@@ -8,7 +8,7 @@ for host in $linuxgateways; do
     dest_gw=/var/cache/ipgem/logs/linux/$host
     dest_r=/var/cache/ipgem/logs/resolver/$host
     mkdir -p "$dest_gw" "$dest_r"
-    rm "$dest_gw"/* "$dest_r"/*
+    rm -f "$dest_gw"/* "$dest_r"/*
 
     if [ "$host" = "localhost" ]; then
         # This special case avoids setting up SSH keys in simple configurations
