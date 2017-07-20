@@ -1,3 +1,7 @@
+# 1.0.1-1, 2017-07-20
+
+- Bugfixes for new hosts with no prior IPGEM installation.
+
 # 1.0.0, 2016-02-12
 
 - Force all the relayed trafic to go through the management interface.
